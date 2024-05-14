@@ -1,0 +1,18 @@
+version: '3.8'
+
+volumes:
+  app-api:
+  
+services:
+  app-api:
+    image: postgres
+    container_name: app-api
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: 'app'
+      POSTGRES_PASSWORD: '123456'
+    volumes:
+      - ./init/:/docker-entrypoint-initdb.d
+      - app-api:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
