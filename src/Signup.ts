@@ -3,6 +3,20 @@ import { validateCpf } from "./validateCpf";
 import { EmailAlreadyExistException, InvalidCpfException, InvalidFieldException } from "./exception";
 import AccountDAO from "./AccountDAO";
 
+export type SignupInput = {
+  accountId?: string
+  name: string
+  email: string
+  cpf: string
+  carPlate?: string | undefined
+  isPassenger?: boolean
+  isDriver?: boolean
+}
+
+export type SignupOutput = {
+	accountId: string
+}
+
 export default class Signup {
 	constructor(readonly accountDao: AccountDAO) {}
 
@@ -14,11 +28,11 @@ export default class Signup {
 		return email.match(/^(.+)@(.+)$/)
 	}
 
-	private isValidCarPlate(carPlate: string) {
-		return carPlate.match(/[A-Z]{3}[0-9]{4}/)
+	private isValidCarPlate(carPlate?: string) {
+		return carPlate?.match(/[A-Z]{3}[0-9]{4}/)
 	}
 
-	async execute(account: any): Promise<any> {
+	async execute(account: SignupInput): Promise<SignupOutput> {
 		account.accountId = crypto.randomUUID()
 		if (await this.accountDao.getByEmail(account.email)) throw new EmailAlreadyExistException()
 		if (!this.isValidName(account.name)) throw new InvalidFieldException('name')

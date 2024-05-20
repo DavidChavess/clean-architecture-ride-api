@@ -1,30 +1,41 @@
 import pgp from "pg-promise";
+import { underlineToCamelCase } from "./underlineToCamelCase";
+
+export type AccountEntity = {
+  accountId: string,
+  name: string,
+  email: string,
+  cpf: string,
+  carPlate: string,
+  isPassenger: boolean,
+  isDriver: boolean
+}
 
 export default interface AccountDAO {
   save(account: any): Promise<void>
-  getById(id: any): Promise<any>
-  getByEmail(email: any): Promise<any>
+  getById(id: any): Promise<AccountEntity | null>
+  getByEmail(email: any): Promise<AccountEntity | null>
 }
 
 export class AccountDAODatabase implements AccountDAO {
   async save(account: any): Promise<void> {
     const connection = await pgp()("postgres://postgres:123456@localhost:5432/app");
     await connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.name, account.email, account.cpf, account.carPlate, !!account.isPassenger, !!account.isDriver]);
-		await connection.$pool.end();
+    await connection.$pool.end();
   }
 
-  async getById(id: string): Promise<any> {
+  async getById(id: string): Promise<AccountEntity | null> {
     const connection = await pgp()("postgres://postgres:123456@localhost:5432/app");
     const [account] = await connection.query("select * from cccat15.account where account_id = $1", [id]);
     await connection.$pool.end();
-    return account
+    return underlineToCamelCase(account);
   }
 
-  async getByEmail(email: string): Promise<any> {
+  async getByEmail(email: string): Promise<AccountEntity | null> {
     const connection = await pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [existsAccount] = await connection.query("select * from cccat15.account where email = $1", [email])
+    const [account] = await connection.query("select * from cccat15.account where email = $1", [email])
     await connection.$pool.end();
-    return existsAccount
+    return underlineToCamelCase(account);
   }
 }
 
@@ -36,15 +47,11 @@ export class AccountDAOMemory implements AccountDAO {
     this.accounts.push(account)
   }
 
-  async getById(id: any): Promise<any> {
-    const account =  this.accounts.find(account => account.accountId === id)
-    account.account_id = account.accountId
-    account.is_driver = account.isDriver
-    account.is_passenger = account.is_passenger
-    return account
+  async getById(id: any): Promise<AccountEntity> {
+    return this.accounts.find(account => account.accountId === id)
   }
 
-  async getByEmail(email: any): Promise<any> {
+  async getByEmail(email: any): Promise<AccountEntity> {
     return this.accounts.find(account => account.email === email)
   }
 }
