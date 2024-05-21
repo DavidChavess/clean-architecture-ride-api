@@ -23,7 +23,7 @@ export type RideEntity = {
 }
 
 export default interface RideDAO {
-  hasPendingRidesForPassenger(accountId: string): Promise<RideEntity | null>
+  getPendingRidesByPassengerId(accountId: string): Promise<RideEntity | null>
   save(ride: any): Promise<void>
   getRide(rideId: string): Promise<RideEntity | null>
 }
@@ -65,7 +65,7 @@ export class RideDAODatabase implements RideDAO {
     }
   }
 
-  async hasPendingRidesForPassenger(accountId: string): Promise<RideEntity | null> {
+  async getPendingRidesByPassengerId(accountId: string): Promise<RideEntity | null> {
     const connection = await pgp()("postgres://postgres:123456@localhost:5432/app")
     const [ride] = await connection.query("select * from cccat15.ride where passenger_id = $1 and status <> $2", [accountId, "completed"])
 		await connection.$pool.end()

@@ -2,7 +2,7 @@ import { AccountDAODatabase } from "../src/AccountDAO"
 import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
 import GetRide from "../src/GetRide"
 import RequestRide, { RequestRideInput } from "../src/RequestRide"
-import { RideDAODatabase } from "../src/RideDao"
+import { RideDAODatabase } from "../src/RideDAO"
 import crypto from 'crypto'
 import Signup, { SignupInput } from "../src/Signup"
 

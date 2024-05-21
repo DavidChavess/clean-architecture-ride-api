@@ -13,5 +13,8 @@ test("Deve testar uma conta criada para passageiro", async () => {
   expect(outputSignup.accountId).toBeDefined()
   const responseGetSignup = await axios.get(`http://localhost:3000/signup/${outputSignup.accountId}`)
   const outputGetSignup = responseGetSignup.data
-  expect(outputGetSignup.name).toBeDefined()  
+  expect(outputGetSignup.accountId).toBe(outputSignup.accountId)
+  expect(outputGetSignup.name).toBe(input.name)
+  expect(outputGetSignup.email).toBe(input.email)
+  expect(outputGetSignup.cpf).toBe(input.cpf)
 })
