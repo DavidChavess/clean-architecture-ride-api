@@ -1,4 +1,4 @@
-import RideDAO from "./RideDAO"
+import RideDAO from "./RideDAO";
 
 export type AccountOuput = {
   accountId: string
