@@ -10,7 +10,8 @@ test("Deve testar uma conta criada para passageiro", async () => {
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: 'any password',
-    isPassenger: true
+    isPassenger: true,
+    isDriver: false
   }
   const responseSignup = await axios.post('http://localhost:3000/signup', input)
   const outputSignup = responseSignup.data
@@ -29,7 +30,8 @@ test("Deve testar uma solicitação de corrida feita por um passageiro", async (
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: 'any password',
-    isPassenger: true
+    isPassenger: true,
+    isDriver: false
   }
   const responseSignup = await axios.post('http://localhost:3000/signup', signupInput)
   const outputSignup = responseSignup.data
@@ -59,7 +61,8 @@ test("Não deve solicitar uma corrida por um usuário que não seja passageiro",
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
     password: 'any password',
-    isPassenger: false
+    isPassenger: false,
+    isDriver: false
   }
   const responseSignup = await axios.post('http://localhost:3000/signup', signupInput)
   const outputSignup = responseSignup.data

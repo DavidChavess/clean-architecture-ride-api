@@ -1,4 +1,4 @@
-import AccountDAO from "./AccountDAO";
+import AccountReposity from "./AccountReposity";
 import { RideAccountNotFoundException } from "./exception/RideAccountNotFoundException";
 import RideDAO from "./RideDAO";
 import crypto from 'crypto'
@@ -18,11 +18,11 @@ export type RequestRideOutput = {
 export default class RequestRide {
   constructor(
     readonly rideDao: RideDAO,
-    readonly accountDao: AccountDAO
+    readonly accountRepository: AccountReposity
   ) { }
 
   async execute(input: RequestRideInput): Promise<RequestRideOutput> {
-    const account = await this.accountDao.getById(input.accountId)
+    const account = await this.accountRepository.getById(input.accountId)
     if (!account) throw new RideAccountNotFoundException()
     if (!account.isPassenger) throw new Error("A conta não é de um passageiro")
     if (await this.rideDao.getPendingRidesByPassengerId(account.accountId)) throw new Error("Existem corridas pendentes")

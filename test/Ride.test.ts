@@ -1,23 +1,34 @@
-import { AccountDAODatabase } from "../src/AccountDAO"
+import { AccountRepositoryDatabase } from "../src/AccountReposity"
 import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
 import GetRide from "../src/GetRide"
 import RequestRide, { RequestRideInput } from "../src/RequestRide"
 import { RideDAODatabase } from "../src/RideDAO"
 import crypto from 'crypto'
-import Signup, { SignupInput } from "../src/Signup"
+import Signup from "../src/Signup"
+
+let rideDao: RideDAODatabase
+let accountRepository: AccountRepositoryDatabase
+let signup: Signup
+let getRide: GetRide
+let requestRide: RequestRide
+
+beforeEach(() => {
+  rideDao = new RideDAODatabase()
+  accountRepository = new AccountRepositoryDatabase()
+  signup = new Signup(accountRepository)
+  getRide = new GetRide(rideDao)
+  requestRide = new RequestRide(rideDao, accountRepository)
+})
 
 test('Deve solicitar corrida por um passgeiro', async () => {
-  const passenger: SignupInput = {
+  const passenger = {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
-    isPassenger: true
+    isPassenger: true,
+    isDriver: false
   }
-  const rideDao = new RideDAODatabase()
-  const accountDao = new AccountDAODatabase()
-  const signup = new Signup(accountDao)
   const { accountId } = await signup.execute(passenger)
-  const ride = new RequestRide(rideDao, accountDao)
   const input: RequestRideInput = {
     accountId,
     fromLat: -21.3750678,
@@ -25,8 +36,7 @@ test('Deve solicitar corrida por um passgeiro', async () => {
     toLat: -21.3628963,
     toLong: -48.2461194
   }
-  const rideOutput = await ride.execute(input)
-  const getRide = new GetRide(rideDao)
+  const rideOutput = await requestRide.execute(input)
   const getRideOrNull = await getRide.execute(rideOutput.rideId)
   const getRideOutput = getRideOrNull!!
   expect(getRideOutput.rideId).toBe(rideOutput.rideId)
@@ -43,8 +53,6 @@ test('Deve solicitar corrida por um passgeiro', async () => {
 })
 
 test('Deve devolver null se a corrida não existir', async () => {
-  const rideDao = new RideDAODatabase()
-  const getRide = new GetRide(rideDao)
   const getRideOutput = await getRide.execute(crypto.randomUUID())
   expect(getRideOutput).not.toBeTruthy()
 })
@@ -57,42 +65,18 @@ test('Deve validar se a conta existe', async () => {
     toLat: -21.3628963,
     toLong: -48.2461194
   }
-  const rideDao = new RideDAODatabase()
-  const accountDao = new AccountDAODatabase()
-  const ride = new RequestRide(rideDao, accountDao)
-  await expect(ride.execute(input)).rejects.toThrow(new RideAccountNotFoundException())
+  await expect(requestRide.execute(input)).rejects.toThrow(new RideAccountNotFoundException())
 })
 
 test('Deve validar se a conta é de um passageiro', async () => {
-  const inputAccount: SignupInput = {
-    name: 'Fulano Tal',
-    email: `input${Math.random()}@gmail.com`,
-    cpf: '97456321558'
-  }
-  const accountDao = new AccountDAODatabase()
-  const signup = new Signup(accountDao)
-  const { accountId } = await signup.execute(inputAccount)
-  const input: RequestRideInput = {
-    accountId,
-    fromLat: -21.3750678,
-    fromLong: -48.2409842,
-    toLat: -21.3628963,
-    toLong: -48.2461194
-  }
-  const rideDao = new RideDAODatabase()
-  const ride = new RequestRide(rideDao, accountDao)
-  await expect(ride.execute(input)).rejects.toThrow(new Error("A conta não é de um passageiro"))
-})
-
-test('Deve validar se existe corridas pendentes', async () => {
-  const inputAccount: SignupInput = {
+  const inputAccount = {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
-    isPassenger: true
+    isPassenger: false,
+    isDriver: true,
+    carPlate: 'SHIK8952'
   }
-  const accountDao = new AccountDAODatabase()
-  const signup = new Signup(accountDao)
   const { accountId } = await signup.execute(inputAccount)
   const input: RequestRideInput = {
     accountId,
@@ -101,8 +85,25 @@ test('Deve validar se existe corridas pendentes', async () => {
     toLat: -21.3628963,
     toLong: -48.2461194
   }
-  const rideDao = new RideDAODatabase()
-  const ride = new RequestRide(rideDao, accountDao)
-  await ride.execute(input)
-  await expect(ride.execute(input)).rejects.toThrow(new Error("Existem corridas pendentes"))
+  await expect(requestRide.execute(input)).rejects.toThrow(new Error("A conta não é de um passageiro"))
+})
+
+test('Deve validar se existe corridas pendentes', async () => {
+  const inputAccount = {
+    name: 'Fulano Tal',
+    email: `input${Math.random()}@gmail.com`,
+    cpf: '97456321558',
+    isPassenger: true,
+    isDriver: false
+  }
+  const { accountId } = await signup.execute(inputAccount)
+  const input: RequestRideInput = {
+    accountId,
+    fromLat: -21.3750678,
+    fromLong: -48.2409842,
+    toLat: -21.3628963,
+    toLong: -48.2461194
+  }
+  await requestRide.execute(input)
+  await expect(requestRide.execute(input)).rejects.toThrow(new Error("Existem corridas pendentes"))
 })

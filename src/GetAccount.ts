@@ -1,4 +1,4 @@
-import AccountDAO from "./AccountDAO";
+import AccountReposity from "./AccountReposity";
 
 export type GetAccountOutput = {
   accountId?: string
@@ -11,9 +11,9 @@ export type GetAccountOutput = {
 }
 
 export default class GetAccount {
-	constructor(readonly accountDao: AccountDAO) {}
+	constructor(readonly accountRepository: AccountReposity) {}
 
 	async execute(accountId: string): Promise<GetAccountOutput | null> {
-		return this.accountDao.getById(accountId)
+		return this.accountRepository.getById(accountId)
 	}
 }

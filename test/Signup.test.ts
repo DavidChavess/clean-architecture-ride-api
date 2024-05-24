@@ -1,49 +1,51 @@
-import AccountDAO, { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO"
+import AccountReposity, { AccountRepositoryDatabase } from "../src/AccountReposity"
 import { EmailAlreadyExistException, InvalidCpfException, InvalidFieldException } from "../src/exception"
 import GetAccount from "../src/GetAccount"
-import Signup, { SignupInput } from "../src/Signup"
+import Signup from "../src/Signup"
 
-function mockSignupInput(): SignupInput {
+function mockPassenger() {
   return {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
-    cpf: '97456321558'
+    cpf: '97456321558',
+    isPassenger: true,
+    isDriver: false
   }
 }
 
 let getAccount: GetAccount 
 let signup: Signup
-let accountDao: AccountDAO
+let accountRepository: AccountReposity
 
 beforeEach(() => {
-  accountDao = new AccountDAODatabase()
-  signup = new Signup(accountDao)
-  getAccount = new GetAccount(accountDao)
+  accountRepository = new AccountRepositoryDatabase()
+  signup = new Signup(accountRepository)
+  getAccount = new GetAccount(accountRepository)
 })
 
 test('Deve testar nome inválido', async () => {
-  const input = { ...mockSignupInput(), name: '123' }
+  const input = { ...mockPassenger(), name: '123' }
   await expect(signup.execute(input)).rejects.toThrow(new InvalidFieldException('name'))
 })
 
 test('Deve testar email inválido', async () => {
-  const input = { ...mockSignupInput(), email: '123.com' }
+  const input = { ...mockPassenger(), email: '123.com' }
   await expect(signup.execute(input)).rejects.toThrow(new InvalidFieldException('email'))
 })
 
 
 test('Deve testar cpf inválido', async () => {
-  const input = { ...mockSignupInput(), cpf: '00000000000' }
+  const input = { ...mockPassenger(), cpf: '00000000000' }
   await expect(signup.execute(input)).rejects.toThrow(new InvalidCpfException())
 })
 
-test('Deve testar placa de carro inválida', async () => {
-  const input = { ...mockSignupInput(), isDriver: true, carPlate: 'Zh55923' }
+test('Deve testar uma conta para um motorista onde a placa de carro é inválida', async () => {
+  const input = { ...mockPassenger(), isPassenger: false, isDriver: true, carPlate: 'Zh55923' }
   await expect(signup.execute(input)).rejects.toThrow(new InvalidFieldException('carPlate'))
 })
 
 test('Deve testar uma conta criada para motorista', async () => {
-  const input: SignupInput = { ...mockSignupInput(), isDriver: true, carPlate: "SJK4875" }
+  const input = { ...mockPassenger(), isPassenger: false, isDriver: true, carPlate: 'SJK4875' }
   const account = await signup.execute(input)
   expect(account.accountId).toBeTruthy()
   const getAccountOutput = await getAccount.execute(account.accountId)
@@ -55,7 +57,7 @@ test('Deve testar uma conta criada para motorista', async () => {
 })
 
 test('Deve testar uma conta criada para passageiro', async () => {
-  const passenger: SignupInput = { ...mockSignupInput(), isPassenger: true }
+  const passenger = mockPassenger()
   const account = await signup.execute(passenger)
   expect(account.accountId).toBeTruthy()
   const getAccountOutput = await getAccount.execute(account.accountId)
@@ -67,7 +69,7 @@ test('Deve testar uma conta criada para passageiro', async () => {
 })
 
 test('Deve testar email já existente', async () => {
-  const input = mockSignupInput()
+  const input = mockPassenger()
   await signup.execute(input)
   await expect(signup.execute(input)).rejects.toThrow(new EmailAlreadyExistException())
 })
