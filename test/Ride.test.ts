@@ -5,7 +5,10 @@ import RequestRide from "../src/RequestRide"
 import { RideRepositoryDatabase } from "../src/RideRepository"
 import crypto from 'crypto'
 import Signup from "../src/Signup"
+import { DataBaseConnection } from "../src/DataBaseConnection"
+import PostgresDataBase from "../src/PostgresDataBase"
 
+let database: DataBaseConnection
 let rideRepository: RideRepositoryDatabase
 let accountRepository: AccountRepositoryDatabase
 let signup: Signup
@@ -13,11 +16,16 @@ let getRide: GetRide
 let requestRide: RequestRide
 
 beforeEach(() => {
-  rideRepository = new RideRepositoryDatabase()
-  accountRepository = new AccountRepositoryDatabase()
+  database = new PostgresDataBase()
+  rideRepository = new RideRepositoryDatabase(database)
+  accountRepository = new AccountRepositoryDatabase(database)
   signup = new Signup(accountRepository)
   getRide = new GetRide(rideRepository, accountRepository)
   requestRide = new RequestRide(rideRepository, accountRepository)
+})
+
+afterEach(async () => {
+  await database.close()
 })
 
 test('Deve solicitar corrida por um passgeiro', async () => {

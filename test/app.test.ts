@@ -37,7 +37,7 @@ test("Deve testar uma solicitação de corrida feita por um passageiro", async (
   const outputSignup = responseSignup.data
   expect(outputSignup.accountId).toBeDefined()
   const rideInput = {
-    accountId: outputSignup.accountId,
+    passengerId: outputSignup.accountId,
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,
@@ -67,7 +67,7 @@ test("Não deve solicitar uma corrida por um usuário que não seja passageiro",
   const responseSignup = await axios.post('http://localhost:3000/signup', signupInput)
   const outputSignup = responseSignup.data
   const rideInput = {
-    accountId: outputSignup.accountId,
+    passengerId: outputSignup.accountId,
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,

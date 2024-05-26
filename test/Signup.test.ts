@@ -1,6 +1,8 @@
 import AccountReposity, { AccountRepositoryDatabase } from "../src/AccountReposity"
+import { DataBaseConnection } from "../src/DataBaseConnection"
 import { EmailAlreadyExistException, InvalidCpfException, InvalidFieldException } from "../src/exception"
 import GetAccount from "../src/GetAccount"
+import PostgresDataBase from "../src/PostgresDataBase"
 import Signup from "../src/Signup"
 
 function mockPassenger() {
@@ -13,14 +15,20 @@ function mockPassenger() {
   }
 }
 
+let database: DataBaseConnection
 let getAccount: GetAccount 
 let signup: Signup
 let accountRepository: AccountReposity
 
 beforeEach(() => {
-  accountRepository = new AccountRepositoryDatabase()
+  database = new PostgresDataBase()
+  accountRepository = new AccountRepositoryDatabase(database)
   signup = new Signup(accountRepository)
   getAccount = new GetAccount(accountRepository)
+})
+
+afterEach(async () => {
+  await database.close()
 })
 
 test('Deve testar nome inválido', async () => {
