@@ -1,23 +1,23 @@
 import { AccountRepositoryDatabase } from "../src/AccountReposity"
 import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
 import GetRide from "../src/GetRide"
-import RequestRide, { RequestRideInput } from "../src/RequestRide"
-import { RideDAODatabase } from "../src/RideDAO"
+import RequestRide from "../src/RequestRide"
+import { RideRepositoryDatabase } from "../src/RideRepository"
 import crypto from 'crypto'
 import Signup from "../src/Signup"
 
-let rideDao: RideDAODatabase
+let rideRepository: RideRepositoryDatabase
 let accountRepository: AccountRepositoryDatabase
 let signup: Signup
 let getRide: GetRide
 let requestRide: RequestRide
 
 beforeEach(() => {
-  rideDao = new RideDAODatabase()
+  rideRepository = new RideRepositoryDatabase()
   accountRepository = new AccountRepositoryDatabase()
   signup = new Signup(accountRepository)
-  getRide = new GetRide(rideDao)
-  requestRide = new RequestRide(rideDao, accountRepository)
+  getRide = new GetRide(rideRepository, accountRepository)
+  requestRide = new RequestRide(rideRepository, accountRepository)
 })
 
 test('Deve solicitar corrida por um passgeiro', async () => {
@@ -29,37 +29,33 @@ test('Deve solicitar corrida por um passgeiro', async () => {
     isDriver: false
   }
   const { accountId } = await signup.execute(passenger)
-  const input: RequestRideInput = {
-    accountId,
+  const input = {
+    passengerId: accountId,
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,
     toLong: -48.2461194
   }
   const rideOutput = await requestRide.execute(input)
-  const getRideOrNull = await getRide.execute(rideOutput.rideId)
-  const getRideOutput = getRideOrNull!!
+  const getRideOutput = await getRide.execute(rideOutput.rideId)
   expect(getRideOutput.rideId).toBe(rideOutput.rideId)
   expect(getRideOutput.fromLat).toBe(input.fromLat)
   expect(getRideOutput.fromLong).toBe(input.fromLong)
   expect(getRideOutput.toLat).toBe(input.toLat)
   expect(getRideOutput.toLong).toBe(input.toLong)
-  expect(getRideOutput.passenger.accountId).toBe(input.accountId)
-  expect(getRideOutput.passenger.cpf).toBe(passenger.cpf)
-  expect(getRideOutput.passenger.email).toBe(passenger.email)
+  expect(getRideOutput.passenger.accountId).toBe(accountId)
   expect(getRideOutput.passenger.name).toBe(passenger.name)
   expect(getRideOutput.status).toBe("requested")
   expect(getRideOutput.date).toBeDefined()
 })
 
-test('Deve devolver null se a corrida não existir', async () => {
-  const getRideOutput = await getRide.execute(crypto.randomUUID())
-  expect(getRideOutput).not.toBeTruthy()
+test('Deve lançar erro se a corrida não existir', async () => {
+  await expect(getRide.execute(crypto.randomUUID())).rejects.toThrow(new Error("Ride not found"))
 })
 
 test('Deve validar se a conta existe', async () => {
-  const input: RequestRideInput = {
-    accountId: crypto.randomUUID(),
+  const input = {
+    passengerId: crypto.randomUUID(),
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,
@@ -78,8 +74,8 @@ test('Deve validar se a conta é de um passageiro', async () => {
     carPlate: 'SHIK8952'
   }
   const { accountId } = await signup.execute(inputAccount)
-  const input: RequestRideInput = {
-    accountId,
+  const input = {
+    passengerId: accountId,
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,
@@ -97,8 +93,8 @@ test('Deve validar se existe corridas pendentes', async () => {
     isDriver: false
   }
   const { accountId } = await signup.execute(inputAccount)
-  const input: RequestRideInput = {
-    accountId,
+  const input = {
+    passengerId: accountId,
     fromLat: -21.3750678,
     fromLong: -48.2409842,
     toLat: -21.3628963,

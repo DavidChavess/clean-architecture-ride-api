@@ -1,9 +1,9 @@
-import express, { json } from "express"
+import express from "express"
 import Signup from "./Signup"
 import { AccountRepositoryDatabase } from "./AccountReposity"
 import GetAccount from "./GetAccount"
 import RequestRide from "./RequestRide"
-import { RideDAODatabase } from "./RideDAO"
+import { RideRepositoryDatabase } from "./RideRepository"
 import GetRide from "./GetRide"
 
 const app = express()
@@ -28,7 +28,7 @@ app.get('/signup/:accountId', async (req, res) => {
 
 app.post('/request_ride', async (req, res) => {
   try {
-    const requestRide = new RequestRide(new RideDAODatabase(), new AccountRepositoryDatabase())
+    const requestRide = new RequestRide(new RideRepositoryDatabase(), new AccountRepositoryDatabase())
     const requestRideOutput = await requestRide.execute(req.body)
     return res.json(requestRideOutput)
   } catch (error: any) {
@@ -37,7 +37,7 @@ app.post('/request_ride', async (req, res) => {
 })
 
 app.get('/rides/:rideId', async (req, res) => {
-  const getRide = new GetRide(new RideDAODatabase())
+  const getRide = new GetRide(new RideRepositoryDatabase(), new AccountRepositoryDatabase())
   const getRideOutput = await getRide.execute(req.params.rideId)
   return res.json(getRideOutput)
 })

@@ -1,16 +1,14 @@
-import RideDAO from "./RideDAO";
+import AccountReposity from "./AccountReposity";
+import RideRepository from "./RideRepository";
 
-export type AccountOuput = {
-  accountId: string
+type PassengetOutput = {
+  accountId: string, 
   name: string
-  email: string
-  cpf: string
 }
 
-export type RideOutput = {
+type Output = {
   rideId: string
-  passenger: AccountOuput,
-  driver: AccountOuput,
+  passenger: PassengetOutput,
   fromLat: number,
   fromLong: number,
   toLat: number,
@@ -20,9 +18,22 @@ export type RideOutput = {
 }
 
 export default class GetRide {
-  constructor(readonly rideDao: RideDAO){}
+  constructor(
+    readonly rideDao: RideRepository,
+    readonly accountRepository: AccountReposity
+  ){}
 
-  async execute(rideId: string): Promise<RideOutput | null> {
-    return this.rideDao.getRide(rideId)
+  async execute(rideId: string): Promise<Output> {
+    const ride = await this.rideDao.getRide(rideId)
+    if (!ride) throw new Error("Ride not found")
+    const passenger = await this.accountRepository.getById(ride.passengerId)
+    if (!passenger) throw new Error("Passenger not found")
+    return {
+      ...ride,
+      passenger: {
+        accountId: passenger.accountId,
+        name: passenger.name
+      }
+    }
   }
 }

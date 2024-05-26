@@ -1,40 +1,34 @@
 import AccountReposity from "./AccountReposity";
 import { RideAccountNotFoundException } from "./exception/RideAccountNotFoundException";
-import RideDAO from "./RideDAO";
-import crypto from 'crypto'
+import Ride from "./Ride";
+import RideRepository from "./RideRepository";
 
-export type RequestRideInput = {
-  accountId: string,
+type Input = {
+  passengerId: string,
   fromLat: number,
   fromLong: number,
   toLat: number,
   toLong: number
 }
 
-export type RequestRideOutput = {
+type Output = {
   rideId: string
 }
 
 export default class RequestRide {
   constructor(
-    readonly rideDao: RideDAO,
+    readonly rideRepository: RideRepository,
     readonly accountRepository: AccountReposity
   ) { }
 
-  async execute(input: RequestRideInput): Promise<RequestRideOutput> {
-    const account = await this.accountRepository.getById(input.accountId)
+  async execute(input: Input): Promise<Output> {
+    const account = await this.accountRepository.getById(input.passengerId)
     if (!account) throw new RideAccountNotFoundException()
     if (!account.isPassenger) throw new Error("A conta não é de um passageiro")
-    if (await this.rideDao.getPendingRidesByPassengerId(account.accountId)) throw new Error("Existem corridas pendentes")
-    const rideId = crypto.randomUUID()
-    const ride = {
-      ...input,
-      rideId,
-      passengerId: input.accountId,
-      status: "requested",
-      date: new Date()
-    };
-    await this.rideDao.save(ride)
-    return { rideId }
+    const pendingRides = await this.rideRepository.getPendingRidesByPassengerId(account.accountId)
+    if (pendingRides) throw new Error("Existem corridas pendentes")
+    const ride = Ride.create(input.passengerId, input.fromLat, input.fromLong, input.toLat, input.toLong)
+    await this.rideRepository.save(ride)
+    return { rideId: ride.rideId }
   }
 }
