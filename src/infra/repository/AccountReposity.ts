@@ -1,5 +1,5 @@
-import Account from "./Account";
-import { DataBaseConnection } from "./DataBaseConnection";
+import Account from "../../domain/Account";
+import { DataBaseConnection } from "../database/DataBaseConnection";
 
 export default interface AccountReposity {
   save(account: any): Promise<void>

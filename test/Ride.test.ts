@@ -1,12 +1,12 @@
-import { AccountRepositoryDatabase } from "../src/AccountReposity"
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
 import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
-import GetRide from "../src/GetRide"
-import RequestRide from "../src/RequestRide"
-import { RideRepositoryDatabase } from "../src/RideRepository"
+import GetRide from "../src/application/usecase/GetRide"
+import RequestRide from "../src/application/usecase/RequestRide"
+import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
 import crypto from 'crypto'
-import Signup from "../src/Signup"
-import { DataBaseConnection } from "../src/DataBaseConnection"
-import PostgresDataBase from "../src/PostgresDataBase"
+import Signup from "../src/application/usecase/Signup"
+import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
+import PostgresDataBase from "../src/infra/database/PostgresDataBase"
 
 let database: DataBaseConnection
 let rideRepository: RideRepositoryDatabase

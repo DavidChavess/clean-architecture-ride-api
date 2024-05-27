@@ -1,4 +1,4 @@
-import AccountReposity from "./AccountReposity";
+import AccountReposity from "../../infra/repository/AccountReposity";
 
 export type GetAccountOutput = {
   accountId?: string

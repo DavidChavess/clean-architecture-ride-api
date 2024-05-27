@@ -1,5 +1,5 @@
-import Ride from './Ride'
-import { DataBaseConnection } from './DataBaseConnection'
+import Ride from '../../domain/Ride'
+import { DataBaseConnection } from '../database/DataBaseConnection';
 
 export default interface RideRepository {
   getPendingRidesByPassengerId(accountId: string): Promise<Ride[] | null>

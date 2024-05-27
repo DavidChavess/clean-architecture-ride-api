@@ -1,4 +1,4 @@
-import { InvalidFieldException, InvalidCpfException } from "./exception";
+import { InvalidFieldException, InvalidCpfException } from "../exception";
 import { validateCpf } from "./validateCpf";
 import crypto from "crypto"
 

@@ -1,5 +1,5 @@
-import AccountReposity from "./AccountReposity";
-import RideRepository from "./RideRepository";
+import AccountReposity from "../../infra/repository/AccountReposity";
+import RideRepository from "../../infra/repository/RideRepository";
 
 type PassengetOutput = {
   accountId: string, 

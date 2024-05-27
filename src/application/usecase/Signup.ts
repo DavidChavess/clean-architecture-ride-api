@@ -1,6 +1,6 @@
-import { EmailAlreadyExistException } from "./exception";
-import AccountReposity from "./AccountReposity";
-import Account from "./Account";
+import { EmailAlreadyExistException } from "../../exception";
+import AccountReposity from "../../infra/repository/AccountReposity";
+import Account from "../../domain/Account";
 
 export default class Signup {
 	constructor(readonly accountRepository: AccountReposity) {}

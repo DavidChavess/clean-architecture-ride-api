@@ -1,7 +1,7 @@
-import AccountReposity from "./AccountReposity";
-import { RideAccountNotFoundException } from "./exception/RideAccountNotFoundException";
-import Ride from "./Ride";
-import RideRepository from "./RideRepository";
+import AccountReposity from "../../infra/repository/AccountReposity";
+import { RideAccountNotFoundException } from "../../exception/RideAccountNotFoundException";
+import Ride from "../../domain/Ride";
+import RideRepository from "../../infra/repository/RideRepository";
 
 type Input = {
   passengerId: string,

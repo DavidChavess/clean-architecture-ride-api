@@ -1,8 +1,8 @@
-import { HttpServer } from "./ExpressAdapter"
-import GetAccount from "./GetAccount"
-import GetRide from "./GetRide"
-import RequestRide from "./RequestRide"
-import Signup from "./Signup"
+import { HttpServer } from "./HttpServer"
+import GetAccount from "../../application/usecase/GetAccount"
+import GetRide from "../../application/usecase/GetRide"
+import RequestRide from "../../application/usecase/RequestRide"
+import Signup from "../../application/usecase/Signup"
 
 export default class MainController {
   constructor(readonly httpServer: HttpServer, readonly signup: Signup, readonly getAccount: GetAccount, readonly getRide: GetRide, requestRide: RequestRide ) {

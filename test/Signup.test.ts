@@ -1,9 +1,9 @@
-import AccountReposity, { AccountRepositoryDatabase } from "../src/AccountReposity"
-import { DataBaseConnection } from "../src/DataBaseConnection"
+import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
+import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
 import { EmailAlreadyExistException, InvalidCpfException, InvalidFieldException } from "../src/exception"
-import GetAccount from "../src/GetAccount"
-import PostgresDataBase from "../src/PostgresDataBase"
-import Signup from "../src/Signup"
+import GetAccount from "../src/application/usecase/GetAccount"
+import PostgresDataBase from "../src/infra/database/PostgresDataBase"
+import Signup from "../src/application/usecase/Signup"
 
 function mockPassenger() {
   return {

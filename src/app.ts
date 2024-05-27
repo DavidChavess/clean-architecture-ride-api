@@ -1,12 +1,12 @@
-import Signup from "./Signup"
-import { AccountRepositoryDatabase } from "./AccountReposity"
-import GetAccount from "./GetAccount"
-import RequestRide from "./RequestRide"
-import { RideRepositoryDatabase } from "./RideRepository"
-import GetRide from "./GetRide"
-import PostgresDataBase from "./PostgresDataBase"
-import ExpressAdapter from "./ExpressAdapter"
-import MainController from "./MainController"
+import Signup from "./application/usecase/Signup"
+import { AccountRepositoryDatabase } from "./infra/repository/AccountReposity"
+import GetAccount from "./application/usecase/GetAccount"
+import RequestRide from "./application/usecase/RequestRide"
+import { RideRepositoryDatabase } from "./infra/repository/RideRepository"
+import GetRide from "./application/usecase/GetRide"
+import PostgresDataBase from "./infra/database/PostgresDataBase"
+import ExpressAdapter from "./infra/http/ExpressAdapter"
+import MainController from "./infra/http/MainController"
 
 const database = new PostgresDataBase()
 const accountRepository = new AccountRepositoryDatabase(database)
