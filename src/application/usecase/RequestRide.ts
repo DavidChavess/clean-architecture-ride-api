@@ -1,4 +1,4 @@
-import AccountReposity from "../../infra/repository/AccountReposity";
+import AccountRepository from "../../infra/repository/AccountRepository";
 import { RideAccountNotFoundException } from "../../exception/RideAccountNotFoundException";
 import Ride from "../../domain/Ride";
 import RideRepository from "../../infra/repository/RideRepository";
@@ -18,7 +18,7 @@ type Output = {
 export default class RequestRide {
   constructor(
     readonly rideRepository: RideRepository,
-    readonly accountRepository: AccountReposity
+    readonly accountRepository: AccountRepository
   ) { }
 
   async execute(input: Input): Promise<Output> {

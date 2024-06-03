@@ -1,9 +1,9 @@
 import { EmailAlreadyExistException } from "../../exception";
-import AccountReposity from "../../infra/repository/AccountReposity";
+import AccountRepository from "../../infra/repository/AccountRepository";
 import Account from "../../domain/Account";
 
 export default class Signup {
-	constructor(readonly accountRepository: AccountReposity) {}
+	constructor(readonly accountRepository: AccountRepository) {}
 
 	async execute(input: Input): Promise<Output> {
 		const account = Account.create(input.name, input.email, input.cpf, input.isPassenger, input.isDriver, input.carPlate)

@@ -1,5 +1,5 @@
 import Signup from "./application/usecase/Signup"
-import { AccountRepositoryDatabase } from "./infra/repository/AccountReposity"
+import { AccountRepositoryDatabase } from "./infra/repository/AccountRepository"
 import GetAccount from "./application/usecase/GetAccount"
 import RequestRide from "./application/usecase/RequestRide"
 import { RideRepositoryDatabase } from "./infra/repository/RideRepository"

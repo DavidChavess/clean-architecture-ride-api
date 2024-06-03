@@ -1,5 +1,5 @@
 import Ride from "../../domain/Ride";
-import AccountReposity from "../../infra/repository/AccountReposity";
+import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
 
 type Account = {
@@ -22,7 +22,7 @@ type Output = {
 export default class GetRide {
   constructor(
     readonly rideDao: RideRepository,
-    readonly accountRepository: AccountReposity
+    readonly accountRepository: AccountRepository
   ) { }
 
   async execute(rideId: string): Promise<Output> {

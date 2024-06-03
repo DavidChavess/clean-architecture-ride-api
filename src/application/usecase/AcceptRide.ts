@@ -1,5 +1,5 @@
 import Ride from "../../domain/Ride";
-import AccountReposity from "../../infra/repository/AccountReposity";
+import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
 
 type Input = {
@@ -9,7 +9,7 @@ type Input = {
 
 export default class AcceptRide {
   constructor(
-    readonly accountRepository: AccountReposity,
+    readonly accountRepository: AccountRepository,
     readonly rideRepository: RideRepository
   ){}  
 
