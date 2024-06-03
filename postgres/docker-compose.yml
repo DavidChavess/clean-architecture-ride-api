@@ -1,18 +1,18 @@
 version: '3.8'
 
 volumes:
-  app-api:
+  ride-api:
   
 services:
-  app-api:
+  ride-api:
     image: postgres
-    container_name: app-api
+    container_name: ride-api
     restart: unless-stopped
     environment:
       POSTGRES_DB: 'app'
       POSTGRES_PASSWORD: '123456'
     volumes:
       - ./init/:/docker-entrypoint-initdb.d
-      - app-api:/var/lib/postgresql/data
+      - ride-api:/var/lib/postgresql/data
     ports:
       - 5432:5432
