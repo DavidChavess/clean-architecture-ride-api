@@ -1,19 +1,21 @@
-import AccountReposity from "../../infra/repository/AccountReposity";
+import AccountRepository from "../../infra/repository/AccountRepository";
 
-export type GetAccountOutput = {
-  accountId?: string
+type Output = {
+  accountId: string
   name: string
   email: string
   cpf: string
-  carPlate?: string | undefined
-  isPassenger?: boolean
-  isDriver?: boolean
+  isPassenger: boolean
+  isDriver: boolean
+  carPlate?: string | null
 }
 
 export default class GetAccount {
-	constructor(readonly accountRepository: AccountReposity) {}
+	constructor(readonly accountRepository: AccountRepository) {}
 
-	async execute(accountId: string): Promise<GetAccountOutput | null> {
-		return this.accountRepository.getById(accountId)
+	async execute(accountId: string): Promise<Output> {
+		const account = await this.accountRepository.getById(accountId)
+    if (!account) throw new Error('Conta não encontrada')
+    return account
 	}
 }
