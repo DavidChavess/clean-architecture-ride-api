@@ -7,8 +7,8 @@ import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
 import PostgresDataBase from "../src/infra/database/PostgresDataBase"
 import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
 import RideRepository, { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
-import { RideRepositorySpy } from "./mock/RideRepositoryMock"
 import crypto from 'crypto'
+import { StartRideRepositoryMock } from "./mock/StartRideRepositoryMock"
 
 let dataBaseConnection: DataBaseConnection
 let rideRepository: RideRepository
@@ -35,10 +35,9 @@ afterEach(async () => {
 })
 
 test('Deve chamar rideReposiroty para buscar corrida ', async () => {
-  const rideRepository = new RideRepositorySpy()
+  const rideRepository = new StartRideRepositoryMock()
   const startRide = new StartRide(rideRepository)
   const rideId = 'any_ride_id'
-  rideRepository.getRideOutput.status = 'accepted'
   await startRide.execute(rideId)
   expect(rideRepository.getRideInput).toBe(rideId)
 })

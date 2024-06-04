@@ -16,14 +16,14 @@ export class RideRepositoryDatabase implements RideRepository {
   async save(ride: Ride): Promise<void> {
     await this.database.query(
       "insert into cccat15.ride (ride_id, passenger_id, status, from_lat, from_long, to_lat, to_long, date) values ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [ride.rideId, ride.passengerId, ride.status, ride.fromLat, ride.fromLong, ride.toLat, ride.toLong, ride.date]
+      [ride.rideId, ride.passengerId, ride.getStatus(), ride.fromLat, ride.fromLong, ride.toLat, ride.toLong, ride.date]
     );
   }
 
   async update(ride: Ride): Promise<void> {
     await this.database.query(
       'update cccat15.ride set passenger_id = $2, status = $3, from_lat = $4, from_long = $5, to_lat = $6, to_long = $7, date = $8, driver_id = $9 where ride_id = $1',
-      [ride.rideId, ride.passengerId, ride.status, ride.fromLat, ride.fromLong, ride.toLat, ride.toLong, ride.date, ride.driverId]
+      [ride.rideId, ride.passengerId, ride.getStatus(), ride.fromLat, ride.fromLong, ride.toLat, ride.toLong, ride.date, ride.getDriverId()]
     );
   }
 

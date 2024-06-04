@@ -1,22 +1,23 @@
 import Ride from "../../src/domain/Ride";
 import RideRepository from "../../src/infra/repository/RideRepository";
 
-export class RideRepositorySpy implements RideRepository {
+export class RequestRideRepositoryMock implements RideRepository {
 
   getRideInput: string = ''
-  getRideOutput: any = Ride.create('any_passenger_id', -56.5865, -45.8989, -30.8785, -48.6256)
+  getRideOutput: Ride | null = null
   getRidesByDriverIdAndStatusInInput: any = {}
   updateInput: Ride | null = null
 
   async getRide(rideId: string): Promise<Ride | null> {
     this.getRideInput = rideId
-    return Promise.resolve(this.getRideOutput)
+    this.getRideOutput = Ride.restore(rideId, 'any_passenger_id', -56.5865, -45.8989, -30.8785, -48.6256, "requested", new Date())
+    return this.getRideOutput
   }
 
   async getRidesByDriverIdAndStatusIn(driverId: string, status: string[]): Promise<Ride[] | null> {
     this.getRidesByDriverIdAndStatusInInput.driverId = driverId
     this.getRidesByDriverIdAndStatusInInput.status = status
-    return Promise.resolve(null)
+    return null
   }
 
   async update(ride: Ride): Promise<void> {

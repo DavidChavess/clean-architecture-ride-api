@@ -2,9 +2,9 @@ import AcceptRide from "../src/application/usecase/AcceptRide"
 import Signup from "../src/application/usecase/Signup"
 import PostgresDataBase from "../src/infra/database/PostgresDataBase"
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
-import { AccountRepositorySpy } from "./mock/AccountReposirotyMock"
+import { AccountRepositoryMock } from "./mock/AccountReposirotyMock"
 import crypto from 'crypto'
-import { RideRepositorySpy } from "./mock/RideRepositoryMock"
+import { RequestRideRepositoryMock } from "./mock/RequestRideRepositoryMock"
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
 import GetRide from "../src/application/usecase/GetRide"
 
@@ -148,12 +148,12 @@ describe('Testes chamando os recursos reais', () => {
 })
 
 describe('Testes mockando os recursos', () => {
-  let rideRepository: RideRepositorySpy
-  let accountRepository: AccountRepositorySpy
+  let rideRepository: RequestRideRepositoryMock
+  let accountRepository: AccountRepositoryMock
 
   beforeEach(async () => {
-    rideRepository = new RideRepositorySpy()
-    accountRepository = new AccountRepositorySpy()
+    rideRepository = new RequestRideRepositoryMock()
+    accountRepository = new AccountRepositoryMock()
     acceptRide = new AcceptRide(accountRepository, rideRepository)
   })
 
@@ -192,7 +192,7 @@ describe('Testes mockando os recursos', () => {
     }
     await acceptRide.execute(input)
     expect(rideRepository.updateInput?.rideId).toBe(input.rideId)
-    expect(rideRepository.updateInput?.driverId).toBe(input.driverId)
-    expect(rideRepository.updateInput?.status).toEqual('accepted')
+    expect(rideRepository.updateInput?.getDriverId()).toBe(input.driverId)
+    expect(rideRepository.updateInput?.getStatus()).toBe('accepted')
   })
 })

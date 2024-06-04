@@ -10,7 +10,7 @@ type Account = {
 type Output = {
   rideId: string
   passenger: Account,
-  driver: Account | null,
+  driver?: Account,
   fromLat: number,
   fromLong: number,
   toLat: number,
@@ -30,18 +30,20 @@ export default class GetRide {
     if (!ride) throw new Error("Ride not found")
     const passenger = await this.accountRepository.getById(ride.passengerId)
     if (!passenger) throw new Error("Passenger not found")
-    const driver = await this.accountRepository.getById(ride.driverId)
+    if (!ride.getDriverId()) return this.toOutput(ride, passenger)
+    const driver = await this.accountRepository.getById(ride.getDriverId()!!)
+    if (!driver) throw new Error("Driver not found");
     return this.toOutput(ride, passenger, driver)
   }
 
-  private toOutput(ride: Ride, passenger: Account, driver: Account | null): Output {
+  private toOutput(ride: Ride, passenger: Account, driver?: Account): Output {
     return {
       rideId: ride.rideId,
       fromLat: ride.fromLat,
       toLat: ride.toLat,
       fromLong: ride.fromLong,
       toLong: ride.toLong,
-      status: ride.status,
+      status: ride.getStatus(),
       date: ride.date,
       driver,
       passenger: {
