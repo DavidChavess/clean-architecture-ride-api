@@ -7,7 +7,7 @@ type Output = {
   cpf: string
   isPassenger: boolean
   isDriver: boolean
-  carPlate?: string | null
+  carPlate?: string
 }
 
 export default class GetAccount {
@@ -16,6 +16,14 @@ export default class GetAccount {
 	async execute(accountId: string): Promise<Output> {
 		const account = await this.accountRepository.getById(accountId)
     if (!account) throw new Error('Conta não encontrada')
-    return account
+    return {
+      accountId: account.accountId,
+      name: account.getName(),
+      cpf: account.getCpf(),
+      email: account.getEmail(),
+      carPlate: account.getCarPlate(),
+      isDriver: account.isDriver,
+      isPassenger: account.isPassenger
+    }
 	}
 }

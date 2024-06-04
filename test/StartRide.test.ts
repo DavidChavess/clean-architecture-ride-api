@@ -5,7 +5,7 @@ import Signup from "../src/application/usecase/Signup"
 import StartRide from "../src/application/usecase/StartRide"
 import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
 import PostgresDataBase from "../src/infra/database/PostgresDataBase"
-import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
+import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
 import RideRepository, { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
 import crypto from 'crypto'
 import { StartRideRepositoryMock } from "./mock/StartRideRepositoryMock"

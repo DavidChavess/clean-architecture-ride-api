@@ -1,4 +1,4 @@
-import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
+import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
 import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
 import { EmailAlreadyExistException, InvalidCpfException, InvalidFieldException } from "../src/exception"
 import GetAccount from "../src/application/usecase/GetAccount"

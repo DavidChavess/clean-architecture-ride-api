@@ -1,4 +1,4 @@
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
 import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
 import GetRide from "../src/application/usecase/GetRide"
 import RequestRide from "../src/application/usecase/RequestRide"

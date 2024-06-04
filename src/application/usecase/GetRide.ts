@@ -1,16 +1,17 @@
-import Ride from "../../domain/Ride";
+import Account from "../../domain/entity/Account";
+import Ride from "../../domain/entity/Ride";
 import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
 
-type Account = {
+type AccountRide = {
   accountId: string,
   name: string
 }
 
 type Output = {
   rideId: string
-  passenger: Account,
-  driver?: Account,
+  passenger: AccountRide,
+  driver?: AccountRide,
   fromLat: number,
   fromLong: number,
   toLat: number,
@@ -37,7 +38,7 @@ export default class GetRide {
   }
 
   private toOutput(ride: Ride, passenger: Account, driver?: Account): Output {
-    return {
+    const output: Output =  {
       rideId: ride.rideId,
       fromLat: ride.fromLat,
       toLat: ride.toLat,
@@ -45,11 +46,17 @@ export default class GetRide {
       toLong: ride.toLong,
       status: ride.getStatus(),
       date: ride.date,
-      driver,
       passenger: {
         accountId: passenger.accountId,
-        name: passenger.name
+        name: passenger.getName()
       }
     }
+    if (driver) {
+      output.driver =  {
+        accountId: driver.accountId,
+        name: driver.getName()
+      }
+    }
+    return output
   }
 }

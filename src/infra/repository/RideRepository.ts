@@ -1,4 +1,4 @@
-import Ride from '../../domain/Ride'
+import Ride from '../../domain/entity/Ride'
 import { DataBaseConnection } from '../database/DataBaseConnection';
 
 export default interface RideRepository {

@@ -1,4 +1,4 @@
-import Ride from "../../src/domain/Ride";
+import Ride from "../../src/domain/entity/Ride";
 import RideRepository from "../../src/infra/repository/RideRepository";
 
 export class RequestRideRepositoryMock implements RideRepository {

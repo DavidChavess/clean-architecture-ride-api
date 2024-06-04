@@ -1,5 +1,5 @@
-import Account from "../../src/domain/Account"
-import AccountReposity from "../../src/infra/repository/AccountReposity"
+import Account from "../../src/domain/entity/Account"
+import AccountReposity from "../../src/infra/repository/AccountRepository"
 
 export class AccountRepositoryMock implements AccountReposity {
   getByIdInput: string = ''

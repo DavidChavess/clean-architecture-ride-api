@@ -1,7 +1,7 @@
 import AcceptRide from "../src/application/usecase/AcceptRide"
 import Signup from "../src/application/usecase/Signup"
 import PostgresDataBase from "../src/infra/database/PostgresDataBase"
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountReposity"
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
 import { AccountRepositoryMock } from "./mock/AccountReposirotyMock"
 import crypto from 'crypto'
 import { RequestRideRepositoryMock } from "./mock/RequestRideRepositoryMock"

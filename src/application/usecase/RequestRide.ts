@@ -1,6 +1,6 @@
 import AccountRepository from "../../infra/repository/AccountRepository";
 import { RideAccountNotFoundException } from "../../exception/RideAccountNotFoundException";
-import Ride from "../../domain/Ride";
+import Ride from "../../domain/entity/Ride";
 import RideRepository from "../../infra/repository/RideRepository";
 
 type Input = {
