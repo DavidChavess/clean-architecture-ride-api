@@ -40,10 +40,10 @@ export default class GetRide {
   private toOutput(ride: Ride, passenger: Account, driver?: Account): Output {
     const output: Output =  {
       rideId: ride.rideId,
-      fromLat: ride.fromLat,
-      toLat: ride.toLat,
-      fromLong: ride.fromLong,
-      toLong: ride.toLong,
+      fromLat: ride.getFromLat(),
+      toLat: ride.getToLat(),
+      fromLong: ride.getFromLong(),
+      toLong: ride.getToLong(),
       status: ride.getStatus(),
       date: ride.date,
       passenger: {
