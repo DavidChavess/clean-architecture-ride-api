@@ -24,9 +24,9 @@ export default class RequestRide {
   async execute(input: Input): Promise<Output> {
     const account = await this.accountRepository.getById(input.passengerId)
     if (!account) throw new RideAccountNotFoundException()
-    if (!account.isPassenger) throw new Error("A conta não é de um passageiro")
+    if (!account.isPassenger) throw new Error("The account is not a passenger")
     const pendingRides = await this.rideRepository.getPendingRidesByPassengerId(account.accountId)
-    if (pendingRides) throw new Error("Existem corridas pendentes")
+    if (pendingRides) throw new Error("It was not possible to request the ride because there are pending rides from the passenger")
     const ride = Ride.create(input.passengerId, input.fromLat, input.fromLong, input.toLat, input.toLong)
     await this.rideRepository.save(ride)
     return { rideId: ride.rideId }

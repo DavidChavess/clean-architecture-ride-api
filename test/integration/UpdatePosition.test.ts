@@ -61,7 +61,7 @@ test('Deve verificar se a corrida esta com status in_progress', async () => {
     lat: 34.34,
     long: 435454
   }
-  await expect(updatePosition.execute(input)).rejects.toThrow(new Error("Corrida deve estar com status: em progresso"))
+  await expect(updatePosition.execute(input)).rejects.toThrow(new Error("The ride was not in_progress"))
 })
 
 test('Deve verificar se a corrida existe', async () => {
@@ -71,7 +71,7 @@ test('Deve verificar se a corrida existe', async () => {
     lat: 34.34,
     long: 43.5454
   }
-  await expect(updatePosition.execute(input)).rejects.toThrow(new Error("Corrida não encontrada"))
+  await expect(updatePosition.execute(input)).rejects.toThrow(new Error("Ride not found"))
 })
 
 test('Deve salvar a posição com sucesso', async () => {

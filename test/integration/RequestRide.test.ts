@@ -92,7 +92,7 @@ test('Deve validar se a conta é de um passageiro', async () => {
     toLat: -21.3628963,
     toLong: -48.2461194
   }
-  await expect(requestRide.execute(input)).rejects.toThrow(new Error("A conta não é de um passageiro"))
+  await expect(requestRide.execute(input)).rejects.toThrow(new Error("The account is not a passenger"))
 })
 
 test('Deve validar se existe corridas pendentes', async () => {
@@ -112,5 +112,5 @@ test('Deve validar se existe corridas pendentes', async () => {
     toLong: -48.2461194
   }
   await requestRide.execute(input)
-  await expect(requestRide.execute(input)).rejects.toThrow(new Error("Existem corridas pendentes"))
+  await expect(requestRide.execute(input)).rejects.toThrow(new Error("It was not possible to request the ride because there are pending rides from the passenger"))
 })

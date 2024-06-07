@@ -35,7 +35,7 @@ describe('Testes chamando os recursos reais', () => {
       driverId: crypto.randomUUID(),
       rideId: crypto.randomUUID()
     }
-    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('Motorista não encontrado'))
+    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('Driver not found'))
   })
 
   test('Deve lançar erro se a conta não for de um motorista', async () => {
@@ -52,7 +52,7 @@ describe('Testes chamando os recursos reais', () => {
       driverId: accountId,
       rideId: crypto.randomUUID()
     }
-    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('A conta não é de um motorista'))
+    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('The account is not a driver'))
   })
 
   test('Deve lançar erro se a corrida não existir', async () => {
@@ -70,7 +70,7 @@ describe('Testes chamando os recursos reais', () => {
       driverId: accountId,
       rideId: crypto.randomUUID()
     }
-    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('Corrida não encontrada'))
+    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('Ride not found'))
   })
 
   test('Deve verificar se o status da corrida é "requested"', async () => {
@@ -87,7 +87,7 @@ describe('Testes chamando os recursos reais', () => {
     const rideId = crypto.randomUUID()
     await database.query("insert into cccat15.ride (ride_id, status) values ($1, $2)", [rideId, 'finished'])
     const input = { driverId, rideId }
-    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('O status da corrida precisa ser requested'))
+    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('The ride was not requested'))
   })
 
   test.each([
@@ -109,7 +109,7 @@ describe('Testes chamando os recursos reais', () => {
     await database.query("insert into cccat15.ride (ride_id, status) values ($1, $2)", [rideId, 'requested'])
     await database.query("insert into cccat15.ride (ride_id, driver_id, status) values ($1, $2, $3)", [anyRideId, driverId, status])
     const input = { driverId, rideId }
-    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('Não foi possivel aceitar corrida porque existem corridas pendentes'))
+    await expect(acceptRide.execute(input)).rejects.toThrow(new Error('It was not possible to accept the ride because there are pending rides from the driver'))
   })
 
   test('Deve associar um motorista a corrida com sucesso', async () => {

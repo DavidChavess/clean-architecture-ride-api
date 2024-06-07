@@ -39,18 +39,18 @@ export default class Ride {
   }
   
   accept(driverId: string): void {
-    if (this.status != 'requested') throw new Error('O status da corrida precisa ser requested')
+    if (this.status != 'requested') throw new Error('The ride was not requested')
     this.status = 'accepted'  
     this.driverId = driverId
   }
 
   start(): void {
-    if (this.status != 'accepted') throw new Error('Corrida não foi aceita ainda')
+    if (this.status != 'accepted') throw new Error('The ride was not accepted')
     this.status = 'in_progress'     
   } 
 
   updatePosition(lastLat: number, lastLong: number) {
-    if (this.status != 'in_progress') throw new Error("Corrida deve estar com status: em progresso")
+    if (this.status != 'in_progress') throw new Error("The ride was not in_progress")
     const currentLast = new Coord(lastLat, lastLong)
     const distance = DistanceCalculator.calculate(this.last, currentLast)
     this.distance += distance

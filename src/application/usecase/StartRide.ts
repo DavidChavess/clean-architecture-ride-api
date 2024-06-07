@@ -5,7 +5,7 @@ export default class StartRide {
 
   async execute(rideId: string): Promise<void> {
     const ride = await this.rideRepository.getRide(rideId)
-    if (!ride) throw new Error('Corrida não encontrada')
+    if (!ride) throw new Error('Ride not found')
     ride.start()
     await this.rideRepository.update(ride)
   }

@@ -44,7 +44,7 @@ test('Deve chamar rideReposiroty para buscar corrida ', async () => {
 
 test('Deve lançar erro caso o ride não existir', async () => {
   const rideId = crypto.randomUUID()
-  await expect(startRide.execute(rideId)).rejects.toThrow(new Error('Corrida não encontrada'))
+  await expect(startRide.execute(rideId)).rejects.toThrow(new Error('Ride not found'))
 })
 
 test('Deve verificar se a corrida está em status "accepted"', async () => {
@@ -64,7 +64,7 @@ test('Deve verificar se a corrida está em status "accepted"', async () => {
     toLong: -48.2461194
   }
   const { rideId } = await requestRide.execute(input)
-  await expect(startRide.execute(rideId)).rejects.toThrow(new Error('Corrida não foi aceita ainda'))
+  await expect(startRide.execute(rideId)).rejects.toThrow(new Error('The ride was not accepted'))
 })
 
 test('Deve modificar corrida para status "in_progress"', async () => {

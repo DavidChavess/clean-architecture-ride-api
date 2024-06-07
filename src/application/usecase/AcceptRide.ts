@@ -14,12 +14,12 @@ export default class AcceptRide {
 
   async execute(input: Input): Promise<void> {
     const driver = await this.accountRepository.getById(input.driverId)
-    if (!driver) throw new Error('Motorista não encontrado')
-    if (!driver.isDriver) throw new Error('A conta não é de um motorista')
+    if (!driver) throw new Error('Driver not found')
+    if (!driver.isDriver) throw new Error('The account is not a driver')
     const ride = await this.rideRepository.getRide(input.rideId)
-    if (!ride) throw new Error('Corrida não encontrada')
+    if (!ride) throw new Error('Ride not found')
     const ridesByDriverIdAndStatusIn = await this.rideRepository.getRidesByDriverIdAndStatusIn(input.driverId, ['accepted', 'in_progress'])
-    if (ridesByDriverIdAndStatusIn) throw new Error('Não foi possivel aceitar corrida porque existem corridas pendentes')
+    if (ridesByDriverIdAndStatusIn) throw new Error('It was not possible to accept the ride because there are pending rides from the driver')
     ride.accept(input.driverId)
     await this.rideRepository.update(ride)
   }

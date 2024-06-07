@@ -34,5 +34,5 @@ test('Deve recuperar uma conta criada para passageiro', async () => {
 })
 
 test('Deve lançar erro se a conta não existir', async () => {
-  await expect(getAccount.execute(crypto.randomUUID())).rejects.toThrow(new Error('Conta não encontrada'))
+  await expect(getAccount.execute(crypto.randomUUID())).rejects.toThrow(new Error('Account not found'))
 })

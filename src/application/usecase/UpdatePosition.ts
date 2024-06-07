@@ -16,7 +16,7 @@ export default class UpdatePosition {
 
   async execute(input: Input): Promise<void> {
     const ride = await this.rideRepository.getRide(input.rideId)
-    if (!ride) throw new Error("Corrida não encontrada");
+    if (!ride) throw new Error("Ride not found");
     ride.updatePosition(input.lat, input.long)
     const position = Position.create(input.rideId, input.lat, input.long)
     await this.positionRepository.save(position)
