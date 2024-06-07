@@ -7,11 +7,13 @@ import crypto from 'crypto'
 import { RequestRideRepositoryMock } from "../mock/RequestRideRepositoryMock"
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import GetRide from "../../src/application/usecase/GetRide"
+import RequestRide from "../../src/application/usecase/RequestRide"
 
 let database: PostgresDataBase
 let signup: Signup
 let getRide: GetRide
 let acceptRide: AcceptRide
+let requestRide: RequestRide
 
 describe('Testes chamando os recursos reais', () => {
   let accountRepository: AccountRepositoryDatabase
@@ -24,6 +26,7 @@ describe('Testes chamando os recursos reais', () => {
     signup = new Signup(accountRepository)
     getRide = new GetRide(rideRepository, accountRepository)
     acceptRide = new AcceptRide(accountRepository, rideRepository)
+    requestRide = new RequestRide(rideRepository, accountRepository)
   })
 
   afterEach(async () => {
@@ -130,18 +133,22 @@ describe('Testes chamando os recursos reais', () => {
       isDriver: false
     }
     const passengerOutput = await signup.execute(passenger)
-    const driverId = driverOutput.accountId
-    const passengerId = passengerOutput.accountId
-    const rideId = crypto.randomUUID()
-    await database.query("insert into cccat15.ride (ride_id, passenger_id, status) values ($1, $2, $3)", [rideId, passengerId, 'requested'])
+    const requestRideInput = {
+      passengerId: passengerOutput.accountId,
+      fromLat: -27.584905257808835,
+      fromLong: -48.545022195325124,
+      toLat: -27.496887588317275,
+      toLong: -48.522234807851476
+    }
+    const { rideId } = await requestRide.execute(requestRideInput)
     const input = { 
-      driverId, 
+      driverId: driverOutput.accountId, 
       rideId 
     }
     await acceptRide.execute(input)
     const getRideOutput = await getRide.execute(rideId)
-    expect(getRideOutput.rideId).toBe(rideId)
-    expect(getRideOutput.driver?.accountId).toBe(driverId)
+    expect(getRideOutput.rideId).toBe(input.rideId)
+    expect(getRideOutput.driver?.accountId).toBe(input.driverId)
     expect(getRideOutput.driver?.name).toBe(driver.name)
     expect(getRideOutput.status).toBe("accepted")
   })

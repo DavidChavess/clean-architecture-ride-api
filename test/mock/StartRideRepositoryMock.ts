@@ -10,7 +10,7 @@ export class StartRideRepositoryMock implements RideRepository {
 
   async getRide(rideId: string): Promise<Ride | null> {
     this.getRideInput = rideId
-    this.getRideOutput = Ride.restore(rideId, 'any_passenger_id', -56.5865, -45.8989, -30.8785, -48.6256, "requested", new Date(), -56.5865, -45.8989, 0)
+    this.getRideOutput = Ride.restore(rideId, 'any_passenger_id', -56.5865, -45.8989, -30.8785, -48.6256, "requested", new Date(), -56.5865, -45.8989, 0, 0)
     this.getRideOutput.accept('any_driver_id')
     return this.getRideOutput
   }

@@ -22,8 +22,8 @@ export class RideRepositoryDatabase implements RideRepository {
 
   async update(ride: Ride): Promise<void> {
     await this.database.query(
-      'update cccat15.ride set status = $1, driver_id = $2, distance = $3, last_lat = $4, last_long = $5 where ride_id = $6',
-      [ride.getStatus(), ride.getDriverId(), ride.getDistance(), ride.getLastLat(), ride.getLastLong(), ride.rideId]
+      'update cccat15.ride set status = $1, driver_id = $2, distance = $3, last_lat = $4, last_long = $5, fare = $6 where ride_id = $7',
+      [ride.getStatus(), ride.getDriverId(), ride.getDistance(), ride.getLastLat(), ride.getLastLong(), ride.getFare(), ride.rideId]
     );
   }
 
@@ -58,6 +58,7 @@ export class RideRepositoryDatabase implements RideRepository {
       Number(ride.last_lat),
       Number(ride.last_long),
       Number(ride.distance),
+      Number(ride.fare),
       ride.driver_id
     )
   }

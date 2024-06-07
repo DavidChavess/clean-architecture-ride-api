@@ -20,7 +20,8 @@ type Output = {
   lastLong: number,
   distance: number,
   status: string,
-  date: Date
+  date: Date,
+  fare: number
 }
 
 export default class GetRide {
@@ -55,7 +56,8 @@ export default class GetRide {
       },
       lastLat: ride.getLastLat(),
       lastLong: ride.getLastLong(),
-      distance: ride.getDistance()
+      distance: ride.getDistance(),
+      fare: ride.getFare()
     }
     if (driver) {
       output.driver =  {
