@@ -1,5 +1,5 @@
 export class RideAccountNotFoundException extends Error {
   constructor(){
-    super("Para criar uma corrida é necessário que a conta exista");
+    super("To create a ride, it's necessary that the account exists.");
   }
 }

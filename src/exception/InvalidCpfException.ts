@@ -1,5 +1,7 @@
-export class InvalidCpfException extends Error {
+import { InvalidFieldException } from "./InvalidFieldException";
+
+export class InvalidCpfException extends InvalidFieldException {
   constructor(){
-    super(`O CPF está inválido`);
+    super('CPF');
   }
 }
