@@ -1,12 +1,12 @@
-import AcceptRide from "../src/application/usecase/AcceptRide"
-import Signup from "../src/application/usecase/Signup"
-import PostgresDataBase from "../src/infra/database/PostgresDataBase"
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
-import { AccountRepositoryMock } from "./mock/AccountReposirotyMock"
+import AcceptRide from "../../src/application/usecase/AcceptRide"
+import Signup from "../../src/application/usecase/Signup"
+import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
+import { AccountRepositoryDatabase } from "../../src/infra/repository/AccountRepository"
+import { AccountRepositoryMock } from "../mock/AccountReposirotyMock"
 import crypto from 'crypto'
-import { RequestRideRepositoryMock } from "./mock/RequestRideRepositoryMock"
-import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
-import GetRide from "../src/application/usecase/GetRide"
+import { RequestRideRepositoryMock } from "../mock/RequestRideRepositoryMock"
+import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
+import GetRide from "../../src/application/usecase/GetRide"
 
 let database: PostgresDataBase
 let signup: Signup

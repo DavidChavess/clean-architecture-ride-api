@@ -17,8 +17,9 @@ export default class UpdatePosition {
   async execute(input: Input): Promise<void> {
     const ride = await this.rideRepository.getRide(input.rideId)
     if (!ride) throw new Error("Corrida não encontrada");
-    if (ride.getStatus() != 'in_progress') throw new Error("Corrida deve estar com status: em progresso")
-    const position = new Position(input.rideId, input.lat, input.long)
+    ride.updatePosition(input.lat, input.long)
+    const position = Position.create(input.rideId, input.lat, input.long)
     await this.positionRepository.save(position)
+    await this.rideRepository.update(ride)
   }
 }

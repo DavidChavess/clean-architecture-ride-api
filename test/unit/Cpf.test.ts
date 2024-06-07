@@ -1,5 +1,5 @@
-import { Cpf } from "../src/domain/vo";
-import { InvalidCpfException } from "../src/exception";
+import { Cpf } from "../../src/domain/vo";
+import { InvalidCpfException } from "../../src/exception";
 
 test.each([
 	"97456321558",

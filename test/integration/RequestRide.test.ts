@@ -1,12 +1,12 @@
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
-import { RideAccountNotFoundException } from "../src/exception/RideAccountNotFoundException"
-import GetRide from "../src/application/usecase/GetRide"
-import RequestRide from "../src/application/usecase/RequestRide"
-import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository"
+import { AccountRepositoryDatabase } from "../../src/infra/repository/AccountRepository"
+import { RideAccountNotFoundException } from "../../src/exception/RideAccountNotFoundException"
+import GetRide from "../../src/application/usecase/GetRide"
+import RequestRide from "../../src/application/usecase/RequestRide"
+import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from 'crypto'
-import Signup from "../src/application/usecase/Signup"
-import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
-import PostgresDataBase from "../src/infra/database/PostgresDataBase"
+import Signup from "../../src/application/usecase/Signup"
+import { DataBaseConnection } from "../../src/infra/database/DataBaseConnection"
+import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
 
 let database: DataBaseConnection
 let rideRepository: RideRepositoryDatabase
@@ -53,6 +53,9 @@ test('Deve solicitar corrida por um passgeiro', async () => {
   expect(getRideOutput.toLong).toBe(input.toLong)
   expect(getRideOutput.passenger.accountId).toBe(accountId)
   expect(getRideOutput.passenger.name).toBe(passenger.name)
+  expect(getRideOutput.lastLat).toBe(input.fromLat)
+  expect(getRideOutput.lastLong).toBe(input.fromLong)
+  expect(getRideOutput.distance).toBe(0)
   expect(getRideOutput.status).toBe("requested")
   expect(getRideOutput.date).toBeDefined()
 })

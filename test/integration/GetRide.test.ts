@@ -1,9 +1,9 @@
-import GetAccount from "../src/application/usecase/GetAccount"
-import Signup from "../src/application/usecase/Signup"
-import { DataBaseConnection } from "../src/infra/database/DataBaseConnection"
-import PostgresDataBase from "../src/infra/database/PostgresDataBase"
-import AccountReposity, { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository"
-import { mockPassenger } from "./mock/mockAccount"
+import GetAccount from "../../src/application/usecase/GetAccount"
+import Signup from "../../src/application/usecase/Signup"
+import { DataBaseConnection } from "../../src/infra/database/DataBaseConnection"
+import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
+import AccountReposity, { AccountRepositoryDatabase } from "../../src/infra/repository/AccountRepository"
+import { mockPassenger } from "../mock/mockAccount"
 import crypto from 'crypto'
 
 let database: DataBaseConnection

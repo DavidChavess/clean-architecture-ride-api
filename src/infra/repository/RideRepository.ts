@@ -15,15 +15,15 @@ export class RideRepositoryDatabase implements RideRepository {
   
   async save(ride: Ride): Promise<void> {
     await this.database.query(
-      "insert into cccat15.ride (ride_id, passenger_id, status, from_lat, from_long, to_lat, to_long, date) values ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [ride.rideId, ride.passengerId, ride.getStatus(), ride.getFromLat(), ride.getFromLong(), ride.getToLat(), ride.getToLong(), ride.date]
+      "insert into cccat15.ride (ride_id, passenger_id, status, from_lat, from_long, to_lat, to_long, date, last_lat, last_long, distance) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+      [ride.rideId, ride.passengerId, ride.getStatus(), ride.getFromLat(), ride.getFromLong(), ride.getToLat(), ride.getToLong(), ride.date, ride.getLastLat(), ride.getLastLong(), ride.getDistance()]
     );
   }
 
   async update(ride: Ride): Promise<void> {
     await this.database.query(
-      'update cccat15.ride set passenger_id = $2, status = $3, from_lat = $4, from_long = $5, to_lat = $6, to_long = $7, date = $8, driver_id = $9 where ride_id = $1',
-      [ride.rideId, ride.passengerId, ride.getStatus(), ride.getFromLat(), ride.getFromLong(), ride.getToLat(), ride.getToLong(), ride.date, ride.getDriverId()]
+      'update cccat15.ride set status = $1, driver_id = $2, distance = $3, last_lat = $4, last_long = $5 where ride_id = $6',
+      [ride.getStatus(), ride.getDriverId(), ride.getDistance(), ride.getLastLat(), ride.getLastLong(), ride.rideId]
     );
   }
 
@@ -55,6 +55,9 @@ export class RideRepositoryDatabase implements RideRepository {
       Number(ride.to_long), 
       ride.status, 
       ride.date,
+      Number(ride.last_lat),
+      Number(ride.last_long),
+      Number(ride.distance),
       ride.driver_id
     )
   }
