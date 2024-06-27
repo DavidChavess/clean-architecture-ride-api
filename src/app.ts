@@ -7,6 +7,7 @@ import GetRide from "./application/usecase/GetRide"
 import PostgresDataBase from "./infra/database/PostgresDataBase"
 import ExpressAdapter from "./infra/http/ExpressAdapter"
 import MainController from "./infra/http/MainController"
+import Registry from "./Registry"
 
 const database = new PostgresDataBase()
 const accountRepository = new AccountRepositoryDatabase(database)
@@ -15,5 +16,10 @@ const signup = new Signup(accountRepository)
 const getAccount = new GetAccount(accountRepository)
 const requestRide = new RequestRide(rideRepository, accountRepository)
 const getRide = new GetRide(rideRepository, accountRepository)
+const registry = Registry.getInstance()
+registry.registry('signup', signup)
+registry.registry('getAccount', getAccount)
+registry.registry('getRide', getRide)
+registry.registry('requestRide', requestRide)
 const expressAdapter = new ExpressAdapter()
-new MainController(expressAdapter, signup, getAccount, getRide, requestRide)
+new MainController(expressAdapter)

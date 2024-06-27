@@ -76,5 +76,5 @@ test("Não deve solicitar uma corrida por um usuário que não seja passageiro",
   const rideOutputResponse = await axios.post('http://localhost:3000/request_ride', rideInput)
   const rideOutput = rideOutputResponse.data
   expect(rideOutputResponse.status).toBe(422)
-  expect(rideOutput.message).toBe("A conta não é de um passageiro")
+  expect(rideOutput.message).toBe("The account is not a passenger")
 })
