@@ -1,4 +1,5 @@
 import Ride from "../../domain/entity/Ride";
+import { NotFoundException } from "../../domain/exception/NotFoundException";
 import { AccountGateway } from "../../infra/gateway/AccountGatewayHttp";
 import RideRepository from "../../infra/repository/RideRepository";
 
@@ -31,7 +32,7 @@ export default class GetRide {
 
   async execute(rideId: string): Promise<Output> {
     const ride = await this.rideDao.getRide(rideId)
-    if (!ride) throw new Error("Ride not found")
+    if (!ride) throw new NotFoundException("Ride not found")
     const passenger = await this.accountGateway.getById(ride.passengerId)
     if (!passenger) throw new Error("Passenger not found")
     if (!ride.getDriverId()) return this.toOutput(ride, passenger)

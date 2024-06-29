@@ -1,4 +1,5 @@
 import axios from "axios"
+import crypto from 'crypto'
 
 axios.defaults.validateStatus = function () {
 	return true;
@@ -33,6 +34,14 @@ test("Deve testar uma solicitação de corrida feita por um passageiro", async (
   expect(getRideOutput.fromLong).toBe(rideInput.fromLong)
   expect(getRideOutput.toLat).toBe(rideInput.toLat)
   expect(getRideOutput.toLong).toBe(rideInput.toLong)
+})
+
+test("Deve retornar 404 quando não encontrar corrida", async () => {
+  const rideId = crypto.randomUUID()
+  const getRideResponse = await axios.get(`http://localhost:3000/rides/${rideId}`)
+  const getRideOutput = getRideResponse.data
+  expect(getRideResponse.status).toBe(404)
+  expect(getRideOutput.message).toBe("Ride not found")
 })
 
 test("Não deve solicitar uma corrida por um usuário que não seja passageiro", async () => {

@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express'
 import { HttpServer } from './HttpServer'
+import { NotFoundException } from '../../domain/exception/NotFoundException'
 
 export default class ExpressAdapter implements HttpServer {
 
@@ -19,6 +20,9 @@ export default class ExpressAdapter implements HttpServer {
         }
         return res.json(response)
       } catch (error: any) {
+        if (error instanceof NotFoundException) {
+          return res.status(404).json({ message: error.message })    
+        }
         return res.status(422).json({ message: error.message })
       }
     })
