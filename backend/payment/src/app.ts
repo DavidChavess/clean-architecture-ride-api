@@ -5,6 +5,8 @@ import EventController from "./infra/event/EventController"
 import RabbitMqEventAdapter from "./infra/event/connection/RabbitMqEventAdapter"
 import { PaymentRepositoryDatabase } from "./infra/repository/PaymentRepository"
 import Registry from "./Registry"
+import MainController from "./infra/http/MainController"
+import ExpressAdapter from "./infra/http/ExpressAdapter"
 
 const database = new PostgresDataBase()
 const paymentRepository = new PaymentRepositoryDatabase(database)
@@ -15,3 +17,5 @@ registry.registry('processPayment', processPayment)
 registry.registry('getPayment', getPayment)
 const rabbitmq = new RabbitMqEventAdapter()
 new EventController(rabbitmq).execute()
+const expressAdapter = new ExpressAdapter()
+new MainController(expressAdapter)
