@@ -9,6 +9,8 @@ import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/Acco
 import { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository"
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from 'crypto'
+import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
+import { PaymentGateway, PaymentGatewayHttp } from "../../src/infra/gateway/PaymentGatewayHttp"
 
 let database: PostgresDataBase
 let accountGateway: AccountGateway
@@ -18,8 +20,10 @@ let startRide: StartRide
 let finishRide: FinishRide
 let getRide: GetRide
 let updatePosition: UpdatePosition
+let eventEmitter: RabbitMqEventAdapter
+let paymentGateway: PaymentGateway
 
-beforeEach(() => {
+beforeEach(async () => {
   database = new PostgresDataBase()
   const rideRepository = new RideRepositoryDatabase(database)
   const positionRepository = new PositionRepositoryDatabase(database)
@@ -28,12 +32,16 @@ beforeEach(() => {
   acceptRide = new AcceptRide(accountGateway, rideRepository)
   startRide = new StartRide(rideRepository)
   getRide = new GetRide(rideRepository, accountGateway)
-  updatePosition = new UpdatePosition(rideRepository, positionRepository)  
-  finishRide = new FinishRide(rideRepository)
+  updatePosition = new UpdatePosition(rideRepository, positionRepository) 
+  eventEmitter = new RabbitMqEventAdapter()
+  await eventEmitter.connect()
+  finishRide = new FinishRide(rideRepository, eventEmitter)
+  paymentGateway = new PaymentGatewayHttp()
 })
 
 afterEach(async () => {
   await database.close()
+  await eventEmitter.close()
 })
 
 
@@ -104,4 +112,9 @@ test('Deve finalizar corrida', async () => {
   const getRideOutput = await getRide.execute(rideId)
   expect(getRideOutput.status).toBe('completed')
   expect(getRideOutput.fare).toBe(21)
+  const getPaymentOutput = await paymentGateway.getByRideId(rideId)
+  expect(getPaymentOutput.paymentId).toBeDefined()
+  expect(getPaymentOutput.rideId).toBe(rideId)
+  expect(getPaymentOutput.amount).toBe(getRideOutput.fare)
+  expect(getPaymentOutput.status).toBe('success')
 })
