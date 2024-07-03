@@ -2,6 +2,7 @@ version: '3.8'
 
 volumes:
   ride-api:
+  rabbitmq-ride:
   
 services:
   ride-api:
@@ -16,3 +17,16 @@ services:
       - ride-api:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  rabbit-mq:
+    image: rabbitmq:3.8-management
+    container_name: rabbit-mq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: 'app'
+      RABBITMQ_DEFAULT_PASS: '123456'
+    volumes:
+      - rabbitmq-ride:/var/lib/rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672

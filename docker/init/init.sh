@@ -23,7 +23,9 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     from_long numeric,
     to_lat numeric,
     to_long numeric,
-    date timestamp
+    date timestamp,
+    last_lat numeric,
+    last_long numeric
   );
   CREATE TABLE cccat15.position (
     position_id uuid,
@@ -31,5 +33,12 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     lat numeric,
     long numeric,
     date timestamp
+  );
+  CREATE TABLE cccat15.payment (
+    payment_id uuid primary key,
+    ride_id uuid,
+    amount numeric,
+    date timestamp,
+    status text
   );
 EOSQL
