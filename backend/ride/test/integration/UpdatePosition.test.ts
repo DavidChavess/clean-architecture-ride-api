@@ -1,41 +1,43 @@
 import AcceptRide from "../../src/application/usecase/AcceptRide";
-import GetPositions from "../../src/application/usecase/GetPositions";
 import GetRide from "../../src/application/usecase/GetRide";
 import RequestRide from "../../src/application/usecase/RequestRide";
 import StartRide from "../../src/application/usecase/StartRide";
 import UpdatePosition from "../../src/application/usecase/UpdatePosition"
 import { DataBaseConnection } from "../../src/infra/database/DataBaseConnection"
 import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
+import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter";
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
-import { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository";
+import { PositionGateway, PositionGatewayHttp } from "../../src/infra/gateway/PositionGatewayHttp";
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from "crypto";
 
 let database: DataBaseConnection
 let updatePosition: UpdatePosition
-let getPositions: GetPositions
 let requestRide: RequestRide
 let acceptRide: AcceptRide
 let startRide: StartRide
 let getRide: GetRide
 let accountGateway: AccountGateway
+let eventEmitter: RabbitMqEventAdapter
+let positionsGateway: PositionGateway
 
-
-beforeEach(() => {
+beforeEach(async () => {
+  eventEmitter = new RabbitMqEventAdapter()
+  await eventEmitter.connect()
   database = new PostgresDataBase()
   const rideRepository = new RideRepositoryDatabase(database)
-  const positionRepository = new PositionRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
-  updatePosition = new UpdatePosition(rideRepository, positionRepository)  
-  getPositions = new GetPositions(positionRepository)
+  updatePosition = new UpdatePosition(rideRepository, eventEmitter)  
   requestRide = new RequestRide(rideRepository, accountGateway)
   acceptRide = new AcceptRide(accountGateway, rideRepository)
   startRide = new StartRide(rideRepository)
   getRide = new GetRide(rideRepository, accountGateway)
+  positionsGateway = new PositionGatewayHttp()
 })
 
 afterEach(async () => {
   await database.close()
+  await eventEmitter.close()
 })
 
 test('Deve verificar se a corrida esta com status in_progress', async () => {
@@ -115,14 +117,12 @@ test('Deve salvar a posição com sucesso', async () => {
   expect(getRideOutput.distance).toBe(10)
   expect(getRideOutput.lastLat).toBe(updatePositionInput.lat)
   expect(getRideOutput.lastLong).toBe(updatePositionInput.long)
-  const [position] = await getPositions.execute(rideId)
+  await new Promise(resolve => setTimeout(resolve, 2000))
+  const positions = await positionsGateway.getByRideId(rideId)
+  expect(positions).toBeDefined()
+  const position = positions!![0]
   expect(position.positionId).toBeDefined()
   expect(position.rideId).toBe(updatePositionInput.rideId)
   expect(position.lat).toBe(updatePositionInput.lat)
   expect(position.long).toBe(updatePositionInput.long)
-})
-
-test('Deve lançar erro se não encontrar posição', async () => {
-  const positionId = crypto.randomUUID()
-  await expect(getPositions.execute(positionId)).rejects.toThrow(new Error('Positions not found'))
 })

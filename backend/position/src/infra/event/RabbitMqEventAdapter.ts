@@ -1,8 +1,7 @@
-import { EventConnection } from "./connection/EventConnection";
+import { Event } from "./Event";
 import amqp from 'amqplib/callback_api';
-import { EventEmitter } from "./EventEmitter";
 
-export default class RabbitMqEventAdapter implements EventConnection, EventEmitter {
+export default class RabbitMqEventAdapter implements Event {
 
   private connection!: amqp.Connection
   private channel!: amqp.Channel
@@ -27,10 +26,19 @@ export default class RabbitMqEventAdapter implements EventConnection, EventEmitt
     if (!this.channel) {
       throw new Error('Channel not found')
     }
-    await new Promise<void>((resolve, reject) => {
-      this.channel.assertQueue(queue, { durable: false })
-      this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)))
-      resolve()
+    await this.channel.assertQueue(queue, { durable: false })
+    await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)))
+  }
+
+  async listener(queue: string, callback: (message: any) => void): Promise<void> {
+    if (!this.channel) {
+      throw new Error('Channel not found')
+    }
+    await this.channel.consume(queue, message => {
+      if (message) {
+        const json = JSON.parse(message.content.toString())
+        callback(json)
+      }
     })
   }
 
@@ -38,6 +46,6 @@ export default class RabbitMqEventAdapter implements EventConnection, EventEmitt
     if (!this.connection) {
       throw new Error('Connection not found')
     }
-    await Promise.resolve(this.connection.close())
+    await this.connection.close()
   }
 }

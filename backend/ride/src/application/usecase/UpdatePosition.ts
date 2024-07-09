@@ -1,5 +1,5 @@
-import { Position } from "../../domain/entity/Position";
-import { PositionRepository } from "../../infra/repository/PositionRepository";
+
+import { EventEmitter } from "../../infra/event/EventEmitter";
 import RideRepository from "../../infra/repository/RideRepository";
 
 type Input = {
@@ -11,15 +11,14 @@ type Input = {
 export default class UpdatePosition {
   constructor(
     readonly rideRepository: RideRepository,
-    readonly positionRepository: PositionRepository
+    readonly eventEmitter: EventEmitter
   ) {}
 
   async execute(input: Input): Promise<void> {
     const ride = await this.rideRepository.getRide(input.rideId)
     if (!ride) throw new Error("Ride not found");
     ride.updatePosition(input.lat, input.long)
-    const position = Position.create(input.rideId, input.lat, input.long)
-    await this.positionRepository.save(position)
     await this.rideRepository.update(ride)
+    await this.eventEmitter.send('position_updated', input)
   }
 }

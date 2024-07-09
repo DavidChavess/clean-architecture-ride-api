@@ -26,12 +26,9 @@ test('Deve enviar e consumir uma mensagem com rabbitmq', async () => {
     amount: 9.99
   }
   await rabbitmq.send('process-payment-queue', input)
-  const timer = setTimeout(async () =>{
-    const getPaymentOutput = await getPayment.execute(input.rideId)
-    expect(getPaymentOutput.paymentId).toBeDefined()
-    expect(getPaymentOutput.rideId).toBe(input.rideId)
-    expect(getPaymentOutput.amount).toBe(input.amount)
-    expect(getPaymentOutput.status).toBe('success')
-  }, 2000)
-  timer.unref()
+  const getPaymentOutput = await getPayment.execute(input.rideId)
+  expect(getPaymentOutput.paymentId).toBeDefined()
+  expect(getPaymentOutput.rideId).toBe(input.rideId)
+  expect(getPaymentOutput.amount).toBe(input.amount)
+  expect(getPaymentOutput.status).toBe('success')
 })

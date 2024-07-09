@@ -6,7 +6,6 @@ import StartRide from "../../src/application/usecase/StartRide"
 import UpdatePosition from "../../src/application/usecase/UpdatePosition"
 import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp"
-import { PositionRepositoryDatabase } from "../../src/infra/repository/PositionRepository"
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from 'crypto'
 import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
@@ -24,17 +23,16 @@ let eventEmitter: RabbitMqEventAdapter
 let paymentGateway: PaymentGateway
 
 beforeEach(async () => {
+  eventEmitter = new RabbitMqEventAdapter()
+  await eventEmitter.connect()
   database = new PostgresDataBase()
   const rideRepository = new RideRepositoryDatabase(database)
-  const positionRepository = new PositionRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
   requestRide = new RequestRide(rideRepository, accountGateway)
   acceptRide = new AcceptRide(accountGateway, rideRepository)
   startRide = new StartRide(rideRepository)
   getRide = new GetRide(rideRepository, accountGateway)
-  updatePosition = new UpdatePosition(rideRepository, positionRepository) 
-  eventEmitter = new RabbitMqEventAdapter()
-  await eventEmitter.connect()
+  updatePosition = new UpdatePosition(rideRepository, eventEmitter) 
   finishRide = new FinishRide(rideRepository, eventEmitter)
   paymentGateway = new PaymentGatewayHttp()
 })
@@ -43,7 +41,6 @@ afterEach(async () => {
   await database.close()
   await eventEmitter.close()
 })
-
 
 test('Deve verificar se existe corrida para a rideId informada', async () => {
   const rideId = crypto.randomUUID()
@@ -112,6 +109,7 @@ test('Deve finalizar corrida', async () => {
   const getRideOutput = await getRide.execute(rideId)
   expect(getRideOutput.status).toBe('completed')
   expect(getRideOutput.fare).toBe(21)
+  await new Promise(resolve => setTimeout(resolve, 2000))
   const getPaymentOutput = await paymentGateway.getByRideId(rideId)
   expect(getPaymentOutput.paymentId).toBeDefined()
   expect(getPaymentOutput.rideId).toBe(rideId)
