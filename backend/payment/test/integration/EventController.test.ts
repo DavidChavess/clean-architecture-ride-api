@@ -19,13 +19,13 @@ afterEach(async () => {
   await Promise.all([database.close(), rabbitmq.close()])
 })
 
-test('Deve enviar e consumir uma mensagem com rabbitmq', async () => {
+test('Deve processar um evento de pagamento', async () => {
   const input = {
     rideId: crypto.randomUUID(),
     creditCardToken: 'any_credit_token',
     amount: 9.99
   }
-  await rabbitmq.send('process-payment-queue', input)
+  await rabbitmq.send('ride_finished', input)
   const getPaymentOutput = await getPayment.execute(input.rideId)
   expect(getPaymentOutput.paymentId).toBeDefined()
   expect(getPaymentOutput.rideId).toBe(input.rideId)
