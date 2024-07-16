@@ -6,7 +6,6 @@ export default class EventController {
 
   async execute(): Promise<void> {
     const registry = Registry.getInstance()
-    await this.event.connect()
     await this.event.listener(
       'position_updated', 
       async message => registry.inject('updatePosition').execute(message)

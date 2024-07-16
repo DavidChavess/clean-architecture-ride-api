@@ -19,6 +19,7 @@ async function main() {
   const expressAdapter = new ExpressAdapter()
   new MainController(expressAdapter)
   const rabbitMqEventAdapter = new RabbitMqEventAdapter()
+  await rabbitMqEventAdapter.connect()
   new EventController(rabbitMqEventAdapter).execute()
 }
 
