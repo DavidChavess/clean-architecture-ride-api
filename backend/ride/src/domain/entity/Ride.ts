@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { Coord } from '../vo/Coord'
 import DistanceCalculator from '../ds/DistanceCalculator'
 import FareCalculator from '../ds/FareCalculator'
+import FareCalculatorFactory from '../ds/FareCalculator'
 
 export default class Ride {
 
@@ -62,7 +63,7 @@ export default class Ride {
   finish(): void {
     if (this.status != 'in_progress') throw new Error("The ride was not in_progress")
     this.status = 'completed'
-    this.fare = FareCalculator.calculate(this.distance) 
+    this.fare = FareCalculatorFactory.create(this.date).calculate(this.distance) 
   }
 
   getDriverId(): string | undefined {

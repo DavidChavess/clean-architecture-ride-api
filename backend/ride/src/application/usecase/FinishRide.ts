@@ -18,6 +18,6 @@ export default class FinishRide {
       creditCardToken: 'any_id',
       amount: ride.getFare()
     }
-    await this.eventEmitter.send('process-payment-queue', message)
+    await this.eventEmitter.send('ride_finished', message)
   }
 }

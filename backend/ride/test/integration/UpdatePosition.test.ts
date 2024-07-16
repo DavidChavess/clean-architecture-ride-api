@@ -117,7 +117,6 @@ test('Deve salvar a posição com sucesso', async () => {
   expect(getRideOutput.distance).toBe(10)
   expect(getRideOutput.lastLat).toBe(updatePositionInput.lat)
   expect(getRideOutput.lastLong).toBe(updatePositionInput.long)
-  await new Promise(resolve => setTimeout(resolve, 2000))
   const positions = await positionsGateway.getByRideId(rideId)
   expect(positions).toBeDefined()
   const position = positions!![0]

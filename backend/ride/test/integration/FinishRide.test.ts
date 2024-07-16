@@ -10,6 +10,7 @@ import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepositor
 import crypto from 'crypto'
 import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
 import { PaymentGateway, PaymentGatewayHttp } from "../../src/infra/gateway/PaymentGatewayHttp"
+import sinon from 'sinon'
 
 let database: PostgresDataBase
 let accountGateway: AccountGateway
@@ -67,7 +68,8 @@ test('Deve verificar se corrida esta com status em progresso', async () => {
   await expect(finishRide.execute(rideId)).rejects.toThrow(new Error("The ride was not in_progress"))
 })
 
-test('Deve finalizar corrida', async () => {
+test('Deve finalizar corrida em horario normal', async () => {
+  const dateStub = sinon.useFakeTimers(new Date("2024-02-26T16:00:00-03:00"));
   const passengerInput = {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
@@ -109,10 +111,61 @@ test('Deve finalizar corrida', async () => {
   const getRideOutput = await getRide.execute(rideId)
   expect(getRideOutput.status).toBe('completed')
   expect(getRideOutput.fare).toBe(21)
-  await new Promise(resolve => setTimeout(resolve, 2000))
   const getPaymentOutput = await paymentGateway.getByRideId(rideId)
   expect(getPaymentOutput.paymentId).toBeDefined()
   expect(getPaymentOutput.rideId).toBe(rideId)
   expect(getPaymentOutput.amount).toBe(getRideOutput.fare)
   expect(getPaymentOutput.status).toBe('success')
+  dateStub.restore()
+})
+
+test('Deve finalizar corrida em horario noturno', async () => {
+  const dateStub = sinon.useFakeTimers(new Date("2024-02-26T23:00:00-03:00"));
+  const passengerInput = {
+    name: 'Fulano Tal',
+    email: `input${Math.random()}@gmail.com`,
+    cpf: '97456321558',
+    isPassenger: true,
+    isDriver: false
+  }
+  const passengerOutput = await accountGateway.signup(passengerInput)
+  const driverInput = {
+    name: 'Fulano Tal',
+    email: `input${Math.random()}@gmail.com`,
+    cpf: '97456321558',
+    isPassenger: true,
+    isDriver: true,
+    carPlate: 'SSF8955'
+  }
+  const driverOutput = await accountGateway.signup(driverInput)
+  const requestRideInput = {
+    passengerId: passengerOutput.accountId,
+    fromLat: -27.584905257808835,
+		fromLong: -48.545022195325124,
+		toLat: -27.496887588317275,
+		toLong: -48.522234807851476
+  }
+  const { rideId } = await requestRide.execute(requestRideInput)
+  const acceptRideInput = { 
+    rideId,
+    driverId: driverOutput.accountId
+  }
+  await acceptRide.execute(acceptRideInput)
+  await startRide.execute(rideId)
+  const updatePositionInput = {
+    rideId,
+    lat: -27.496887588317275,
+		long: -48.522234807851476
+  }
+  await updatePosition.execute(updatePositionInput)
+  await finishRide.execute(rideId)
+  const getRideOutput = await getRide.execute(rideId)
+  expect(getRideOutput.status).toBe('completed')
+  expect(getRideOutput.fare).toBe(39)
+  const getPaymentOutput = await paymentGateway.getByRideId(rideId)
+  expect(getPaymentOutput.paymentId).toBeDefined()
+  expect(getPaymentOutput.rideId).toBe(rideId)
+  expect(getPaymentOutput.amount).toBe(getRideOutput.fare)
+  expect(getPaymentOutput.status).toBe('success')
+  dateStub.restore()
 })
