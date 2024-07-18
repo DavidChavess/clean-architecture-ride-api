@@ -27,9 +27,11 @@ export default class RabbitMqEventAdapter implements EventConnection {
     if (!this.channel) {
       throw new Error('Channel not found')
     }
+    console.log(`Enviando mensagem para a fila ${queue}`, message)
     await new Promise<void>((resolve, reject) => {
       this.channel.assertQueue(queue, { durable: false })
       this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)))
+      console.log(`Mensagem enviada para a fila ${queue}`, message)
       resolve()
     })
   }
@@ -38,14 +40,16 @@ export default class RabbitMqEventAdapter implements EventConnection {
     if (!this.channel) {
       throw new Error('Channel not found')
     }
-    await new Promise<void>((resolve, reject) => {
-      this.channel.consume(queue, (message => {
-        if (message) {
+    await this.channel.consume(queue, async message => {
+      if (message) {
+        try {
           const json = JSON.parse(message.content.toString())
-          callback(json)
+          await callback(json)
+          this.channel.ack(message)
+        } catch (msg: any) {
+          console.log(msg)
         }
-        resolve()
-      }), { noAck: true })
+      }
     })
   }
 
