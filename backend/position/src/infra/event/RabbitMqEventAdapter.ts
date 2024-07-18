@@ -34,10 +34,15 @@ export default class RabbitMqEventAdapter implements Event {
     if (!this.channel) {
       throw new Error('Channel not found')
     }
-    await this.channel.consume(queue, message => {
+    await this.channel.consume(queue, async message => {
       if (message) {
-        const json = JSON.parse(message.content.toString())
-        callback(json)
+        try {
+          const json = JSON.parse(message.content.toString())
+          await callback(json)
+          this.channel.ack(message)
+        } catch (msg: any) {
+          console.log(msg)
+        }
       }
     })
   }
