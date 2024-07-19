@@ -4,6 +4,7 @@ import DistanceCalculator from '../ds/DistanceCalculator'
 import FareCalculatorFactory from '../ds/FareCalculator'
 import Aggregate from '../event/Aggregate'
 import RideFinishedEvent from '../event/RideFinishedEvent'
+import UpdatePositionEvent from '../event/UpdatePositionEvent'
 
 export default class Ride extends Aggregate {
 
@@ -60,6 +61,7 @@ export default class Ride extends Aggregate {
     const distance = DistanceCalculator.calculate(this.last, currentLast)
     this.distance += distance
     this.last = currentLast
+    this.notify(new UpdatePositionEvent(this.rideId, lastLat, lastLong))
   }
 
   finish(): void {
