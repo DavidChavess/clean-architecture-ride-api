@@ -23,13 +23,13 @@ export default class RabbitMqEventAdapter implements EventConnection, EventEmitt
     })
   }
 
-  async send(queue: string, message: any): Promise<void> {
+  async notify(event: string, data: any): Promise<void> {
     if (!this.channel) {
       throw new Error('Channel not found')
     }
     await new Promise<void>((resolve, reject) => {
-      this.channel.assertQueue(queue, { durable: false })
-      this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)))
+      this.channel.assertQueue(event, { durable: false })
+      this.channel.sendToQueue(event, Buffer.from(JSON.stringify(data)))
       resolve()
     })
   }

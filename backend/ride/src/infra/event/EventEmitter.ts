@@ -1,3 +1,3 @@
 export interface EventEmitter {
-  send(queue: string, message: any): Promise<void>
+  notify(event: string, data: any): Promise<void>
 }

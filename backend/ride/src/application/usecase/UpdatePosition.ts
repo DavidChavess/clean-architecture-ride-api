@@ -19,6 +19,6 @@ export default class UpdatePosition {
     if (!ride) throw new Error("Ride not found");
     ride.updatePosition(input.lat, input.long)
     await this.rideRepository.update(ride)
-    await this.eventEmitter.send('position_updated', input)
+    await this.eventEmitter.notify('position_updated', input)
   }
 }

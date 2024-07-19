@@ -20,12 +20,12 @@ let startRide: StartRide
 let finishRide: FinishRide
 let getRide: GetRide
 let updatePosition: UpdatePosition
-let eventEmitter: RabbitMqEventAdapter
+let rabbitMqAdapter: RabbitMqEventAdapter
 let paymentGateway: PaymentGateway
 
 beforeEach(async () => {
-  eventEmitter = new RabbitMqEventAdapter()
-  await eventEmitter.connect()
+  rabbitMqAdapter = new RabbitMqEventAdapter()
+  await rabbitMqAdapter.connect()
   database = new PostgresDataBase()
   const rideRepository = new RideRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
@@ -33,14 +33,14 @@ beforeEach(async () => {
   acceptRide = new AcceptRide(accountGateway, rideRepository)
   startRide = new StartRide(rideRepository)
   getRide = new GetRide(rideRepository, accountGateway)
-  updatePosition = new UpdatePosition(rideRepository, eventEmitter) 
-  finishRide = new FinishRide(rideRepository, eventEmitter)
+  updatePosition = new UpdatePosition(rideRepository, rabbitMqAdapter) 
+  finishRide = new FinishRide(rideRepository, rabbitMqAdapter)
   paymentGateway = new PaymentGatewayHttp()
 })
 
 afterEach(async () => {
   await database.close()
-  await eventEmitter.close()
+  await rabbitMqAdapter.close()
 })
 
 test('Deve verificar se existe corrida para a rideId informada', async () => {
