@@ -9,8 +9,7 @@ import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/Acco
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from 'crypto'
 import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
-import { PaymentGateway, PaymentGatewayHttp } from "../../src/infra/gateway/PaymentGatewayHttp"
-import sinon from 'sinon'
+import { advanceTo, clear } from 'jest-date-mock'
 
 let database: PostgresDataBase
 let accountGateway: AccountGateway
@@ -21,21 +20,20 @@ let finishRide: FinishRide
 let getRide: GetRide
 let updatePosition: UpdatePosition
 let rabbitMqAdapter: RabbitMqEventAdapter
-let paymentGateway: PaymentGateway
 
 beforeEach(async () => {
   rabbitMqAdapter = new RabbitMqEventAdapter()
   await rabbitMqAdapter.connect()
   database = new PostgresDataBase()
+  database.connect()
   const rideRepository = new RideRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
-  requestRide = new RequestRide(rideRepository, accountGateway)
-  acceptRide = new AcceptRide(accountGateway, rideRepository)
-  startRide = new StartRide(rideRepository)
+  requestRide = new RequestRide(rideRepository, accountGateway, rabbitMqAdapter)
+  acceptRide = new AcceptRide(accountGateway, rideRepository, rabbitMqAdapter)
+  startRide = new StartRide(rideRepository, rabbitMqAdapter)
   getRide = new GetRide(rideRepository, accountGateway)
   updatePosition = new UpdatePosition(rideRepository, rabbitMqAdapter) 
   finishRide = new FinishRide(rideRepository, rabbitMqAdapter)
-  paymentGateway = new PaymentGatewayHttp()
 })
 
 afterEach(async () => {
@@ -69,7 +67,7 @@ test('Deve verificar se corrida esta com status em progresso', async () => {
 })
 
 test('Deve finalizar corrida em horario normal', async () => {
-  const dateStub = sinon.useFakeTimers(new Date("2024-02-26T16:00:00-03:00"));
+  advanceTo(new Date("2024-02-26T16:00:00-03:00"));
   const passengerInput = {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
@@ -111,16 +109,11 @@ test('Deve finalizar corrida em horario normal', async () => {
   const getRideOutput = await getRide.execute(rideId)
   expect(getRideOutput.status).toBe('completed')
   expect(getRideOutput.fare).toBe(21)
-  const getPaymentOutput = await paymentGateway.getByRideId(rideId)
-  expect(getPaymentOutput.paymentId).toBeDefined()
-  expect(getPaymentOutput.rideId).toBe(rideId)
-  expect(getPaymentOutput.amount).toBe(getRideOutput.fare)
-  expect(getPaymentOutput.status).toBe('success')
-  dateStub.restore()
+  clear()
 })
 
 test('Deve finalizar corrida em horario noturno', async () => {
-  const dateStub = sinon.useFakeTimers(new Date("2024-02-26T23:00:00-03:00"));
+  advanceTo(new Date("2024-02-26T23:00:00-03:00"));
   const passengerInput = {
     name: 'Fulano Tal',
     email: `input${Math.random()}@gmail.com`,
@@ -162,10 +155,5 @@ test('Deve finalizar corrida em horario noturno', async () => {
   const getRideOutput = await getRide.execute(rideId)
   expect(getRideOutput.status).toBe('completed')
   expect(getRideOutput.fare).toBe(39)
-  const getPaymentOutput = await paymentGateway.getByRideId(rideId)
-  expect(getPaymentOutput.paymentId).toBeDefined()
-  expect(getPaymentOutput.rideId).toBe(rideId)
-  expect(getPaymentOutput.amount).toBe(getRideOutput.fare)
-  expect(getPaymentOutput.status).toBe('success')
-  dateStub.restore()
+  clear()
 })

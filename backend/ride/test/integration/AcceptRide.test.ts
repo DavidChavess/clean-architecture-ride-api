@@ -7,26 +7,33 @@ import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepositor
 import GetRide from "../../src/application/usecase/GetRide"
 import RequestRide from "../../src/application/usecase/RequestRide"
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp"
+import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
+import EventEmitterMock from "../mock/EventEmitterMock"
 
 let database: PostgresDataBase
 let getRide: GetRide
 let acceptRide: AcceptRide
 let requestRide: RequestRide
+let rabbitMqAdapter: RabbitMqEventAdapter
 
 describe('Testes chamando os recursos reais', () => {
   let accountGateway: AccountGateway
 
   beforeEach(async () => {
     database = new PostgresDataBase()
+    await database.connect()
+    rabbitMqAdapter = new RabbitMqEventAdapter()
+    await rabbitMqAdapter.connect()
     accountGateway = new AccountGatewayHttp()
     const rideRepository = new RideRepositoryDatabase(database)
     getRide = new GetRide(rideRepository, accountGateway)
-    acceptRide = new AcceptRide(accountGateway, rideRepository)
-    requestRide = new RequestRide(rideRepository, accountGateway)
+    acceptRide = new AcceptRide(accountGateway, rideRepository, rabbitMqAdapter)
+    requestRide = new RequestRide(rideRepository, accountGateway, rabbitMqAdapter)
   })
 
   afterEach(async () => {
     await database.close()
+    await rabbitMqAdapter.close()
   })
 
   test('Deve lançar erro se a conta do motorista não existir', async () => {
@@ -157,7 +164,7 @@ describe('Testes mockando os recursos', () => {
   beforeEach(async () => {
     rideRepository = new RequestRideRepositoryMock()
     accountGateway = new AccountGatewayMock()
-    acceptRide = new AcceptRide(accountGateway, rideRepository)
+    acceptRide = new AcceptRide(accountGateway, rideRepository, new EventEmitterMock())
   })
 
   test('Deve chamar accountRepository para buscar um motorista com valores corretos', async () => {

@@ -12,10 +12,13 @@ export default class FinishRide {
   async execute(rideId: string): Promise<void> {
     const ride = await this.rideRepository.getRide(rideId)
     if (!ride) throw new Error('Ride not found')
-    ride.register('ride_finished', async (domainEvent: DomainEvent) => {
-      await this.rideRepository.update(ride)
-      await this.eventEmitter.notify(domainEvent.eventName, domainEvent)
+    const events = ['process_payment', 'ride_finished']
+    events.forEach(event => {
+      ride.register(event, async (domainEvent: DomainEvent) => {
+        await this.eventEmitter.notify(domainEvent.eventName, domainEvent)
+      })
     })
     ride.finish()
+    await this.rideRepository.update(ride)
   }
 }

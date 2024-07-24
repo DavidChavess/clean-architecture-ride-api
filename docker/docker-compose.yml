@@ -3,6 +3,7 @@ version: '3.8'
 volumes:
   ride-api:
   rabbitmq-ride:
+  ride-mongodb:
   
 services:
   ride-api:
@@ -30,3 +31,12 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+
+  mongo: 
+    container_name: node-ride-api
+    image: mongo:5.0
+    restart: unless-stopped
+    volumes:
+      - ride-mongodb:/data/db
+    ports:
+      - 27017:27017

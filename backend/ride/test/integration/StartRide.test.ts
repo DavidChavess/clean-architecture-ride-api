@@ -8,32 +8,45 @@ import RideRepository, { RideRepositoryDatabase } from "../../src/infra/reposito
 import crypto from 'crypto'
 import { StartRideRepositoryMock } from "../mock/StartRideRepositoryMock"
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp"
+import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
+import EventEmitterMock from "../mock/EventEmitterMock"
+import GetRideQuery from "../../src/application/query/GetRideQuery"
+import MongoDataBase from "../../src/infra/database/MongoDataBase"
 
+let mongodb: MongoDataBase
 let dataBaseConnection: DataBaseConnection
 let rideRepository: RideRepository
 let accountGateway: AccountGateway
 let startRide: StartRide
 let requestRide: RequestRide
-let getRide: GetRide
+let getRideProjection: GetRideQuery
 let acceptRide: AcceptRide
+let rabbitMqEventAdapter: RabbitMqEventAdapter
 
-beforeEach(() => {
+beforeEach(async () => {
   dataBaseConnection = new PostgresDataBase()
+  dataBaseConnection.connect()
+  rabbitMqEventAdapter = new RabbitMqEventAdapter()
+  await rabbitMqEventAdapter.connect()
   rideRepository = new RideRepositoryDatabase(dataBaseConnection)
-  startRide = new StartRide(rideRepository)
+  startRide = new StartRide(rideRepository, rabbitMqEventAdapter)
   accountGateway = new AccountGatewayHttp()
-  requestRide = new RequestRide(rideRepository, accountGateway)
-  getRide = new GetRide(rideRepository, accountGateway)
-  acceptRide = new AcceptRide(accountGateway, rideRepository)
+  requestRide = new RequestRide(rideRepository, accountGateway, rabbitMqEventAdapter)
+  mongodb = new MongoDataBase()
+  await mongodb.connect()
+  getRideProjection = new GetRideQuery(mongodb)
+  acceptRide = new AcceptRide(accountGateway, rideRepository, rabbitMqEventAdapter)
 })
 
 afterEach(async () => {
   await dataBaseConnection.close()
+  await rabbitMqEventAdapter.close()
+  await mongodb.close()
 })
 
 test('Deve chamar rideReposiroty para buscar corrida ', async () => {
   const rideRepository = new StartRideRepositoryMock()
-  const startRide = new StartRide(rideRepository)
+  const startRide = new StartRide(rideRepository, new EventEmitterMock())
   const rideId = 'any_ride_id'
   await startRide.execute(rideId)
   expect(rideRepository.getRideInput).toBe(rideId)
@@ -66,7 +79,7 @@ test('Deve verificar se a corrida está em status "accepted"', async () => {
 
 test('Deve modificar corrida para status "in_progress"', async () => {
   const passengerInput = {
-    name: 'Fulano Tal',
+    name: 'Passenger LastName',
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
     isPassenger: true,
@@ -74,7 +87,7 @@ test('Deve modificar corrida para status "in_progress"', async () => {
   }
   const passengerOutput = await accountGateway.signup(passengerInput)
   const driverInput = {
-    name: 'Fulano Tal',
+    name: 'Driver LastName',
     email: `input${Math.random()}@gmail.com`,
     cpf: '97456321558',
     isPassenger: true,
@@ -96,6 +109,20 @@ test('Deve modificar corrida para status "in_progress"', async () => {
   }
   await acceptRide.execute(input)
   await startRide.execute(rideId)
-  const getRideOutput = await getRide.execute(rideId)
+  const getRideOutput = await getRideProjection.execute(rideId)
+  const passenger = { accountId: passengerOutput.accountId, ...passengerInput }
+  const driver = { accountId: driverOutput.accountId, ...driverInput }
   expect(getRideOutput.status).toBe("in_progress")
+  expect(getRideOutput.rideId).toBe(rideId)
+  expect(getRideOutput.fromLat).toBe(requestRideInput.fromLat)
+  expect(getRideOutput.fromLong).toBe(requestRideInput.fromLong)
+  expect(getRideOutput.toLat).toBe(requestRideInput.toLat)
+  expect(getRideOutput.toLong).toBe(requestRideInput.toLong)
+  expect(getRideOutput.passenger).toEqual(passenger)
+  expect(getRideOutput.driver).toEqual(driver)
+  expect(getRideOutput.lastLat).toBe(requestRideInput.fromLat)
+  expect(getRideOutput.lastLong).toBe(requestRideInput.fromLong)
+  expect(getRideOutput.distance).toBe(0)
+  expect(getRideOutput.fare).toBe(0)
+  expect(getRideOutput.date).toBeDefined()
 })

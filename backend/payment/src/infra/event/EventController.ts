@@ -8,7 +8,7 @@ export default class EventController {
     const registry = Registry.getInstance()
     await this.eventConnection.connect()
     await this.eventConnection.listener(
-      'ride_finished', 
+      'process_payment', 
       async message => registry.inject('processPayment').execute(message)
     )   
   }

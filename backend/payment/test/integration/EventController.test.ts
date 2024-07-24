@@ -25,7 +25,7 @@ test('Deve processar um evento de pagamento', async () => {
     creditCardToken: 'any_credit_token',
     amount: 9.99
   }
-  await rabbitmq.send('ride_finished', input)
+  await rabbitmq.send('process_payment', input)
   const getPaymentOutput = await getPayment.execute(input.rideId)
   expect(getPaymentOutput.paymentId).toBeDefined()
   expect(getPaymentOutput.rideId).toBe(input.rideId)

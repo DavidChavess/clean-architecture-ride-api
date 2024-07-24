@@ -19,9 +19,9 @@ export default class UpdatePosition {
     const ride = await this.rideRepository.getRide(input.rideId)
     if (!ride) throw new Error("Ride not found");
     ride.register('position_updated', async (domainEvent: DomainEvent) => {
-      await this.rideRepository.update(ride)
       await this.eventEmitter.notify(domainEvent.eventName, domainEvent)  
     })
     ride.updatePosition(input.lat, input.long)
+    await this.rideRepository.update(ride)
   }
 }

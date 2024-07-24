@@ -7,7 +7,6 @@ import { DataBaseConnection } from "../../src/infra/database/DataBaseConnection"
 import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
 import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter";
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp";
-import { PositionGateway, PositionGatewayHttp } from "../../src/infra/gateway/PositionGatewayHttp";
 import { RideRepositoryDatabase } from "../../src/infra/repository/RideRepository"
 import crypto from "crypto";
 
@@ -18,26 +17,25 @@ let acceptRide: AcceptRide
 let startRide: StartRide
 let getRide: GetRide
 let accountGateway: AccountGateway
-let eventEmitter: RabbitMqEventAdapter
-let positionsGateway: PositionGateway
+let rabbitMqEventAdapter: RabbitMqEventAdapter
 
 beforeEach(async () => {
-  eventEmitter = new RabbitMqEventAdapter()
-  await eventEmitter.connect()
+  rabbitMqEventAdapter = new RabbitMqEventAdapter()
+  await rabbitMqEventAdapter.connect()
   database = new PostgresDataBase()
+  database.connect()
   const rideRepository = new RideRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
-  updatePosition = new UpdatePosition(rideRepository, eventEmitter)  
-  requestRide = new RequestRide(rideRepository, accountGateway)
-  acceptRide = new AcceptRide(accountGateway, rideRepository)
-  startRide = new StartRide(rideRepository)
+  updatePosition = new UpdatePosition(rideRepository, rabbitMqEventAdapter)  
+  requestRide = new RequestRide(rideRepository, accountGateway, rabbitMqEventAdapter)
+  acceptRide = new AcceptRide(accountGateway, rideRepository, rabbitMqEventAdapter)
+  startRide = new StartRide(rideRepository, rabbitMqEventAdapter)
   getRide = new GetRide(rideRepository, accountGateway)
-  positionsGateway = new PositionGatewayHttp()
 })
 
 afterEach(async () => {
   await database.close()
-  await eventEmitter.close()
+  await rabbitMqEventAdapter.close()
 })
 
 test('Deve verificar se a corrida esta com status in_progress', async () => {
@@ -117,11 +115,4 @@ test('Deve salvar a posição com sucesso', async () => {
   expect(getRideOutput.distance).toBe(10)
   expect(getRideOutput.lastLat).toBe(updatePositionInput.lat)
   expect(getRideOutput.lastLong).toBe(updatePositionInput.long)
-  const positions = await positionsGateway.getByRideId(rideId)
-  expect(positions).toBeDefined()
-  const position = positions!![0]
-  expect(position.positionId).toBeDefined()
-  expect(position.rideId).toBe(updatePositionInput.rideId)
-  expect(position.lat).toBe(updatePositionInput.lat)
-  expect(position.long).toBe(updatePositionInput.long)
 })

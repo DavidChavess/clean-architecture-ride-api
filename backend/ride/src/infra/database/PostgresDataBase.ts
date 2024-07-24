@@ -4,8 +4,12 @@ import { DataBaseConnection } from "./DataBaseConnection";
 export default class PostgresDataBase implements DataBaseConnection {
   connection: any
 
-  constructor() {
+  async connect(): Promise<void> {
     this.connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+  }
+
+  async getConnection(): Promise<any> {
+    return this.connection
   }
 
   async query(query: any, param: any): Promise<any> {

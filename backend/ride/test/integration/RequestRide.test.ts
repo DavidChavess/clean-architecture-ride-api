@@ -5,23 +5,29 @@ import crypto from 'crypto'
 import { DataBaseConnection } from "../../src/infra/database/DataBaseConnection"
 import PostgresDataBase from "../../src/infra/database/PostgresDataBase"
 import { AccountGateway, AccountGatewayHttp } from "../../src/infra/gateway/AccountGatewayHttp"
+import RabbitMqEventAdapter from "../../src/infra/event/RabbitMqEventAdapter"
 
 let database: DataBaseConnection
 let rideRepository: RideRepositoryDatabase
 let accountGateway: AccountGateway
 let getRide: GetRide
 let requestRide: RequestRide
+let rabbitMqAdapter: RabbitMqEventAdapter
 
-beforeEach(() => {
+beforeEach(async () => {
   database = new PostgresDataBase()
+  await database.connect()
+  rabbitMqAdapter = new RabbitMqEventAdapter()
+  await rabbitMqAdapter.connect()
   rideRepository = new RideRepositoryDatabase(database)
   accountGateway = new AccountGatewayHttp()
   getRide = new GetRide(rideRepository, accountGateway)
-  requestRide = new RequestRide(rideRepository, accountGateway)
+  requestRide = new RequestRide(rideRepository, accountGateway, rabbitMqAdapter)
 })
 
 afterEach(async () => {
   await database.close()
+  await rabbitMqAdapter.close()
 })
 
 test('Deve solicitar corrida por um passgeiro e buscar todos os dados da corrida', async () => {
